@@ -107,8 +107,8 @@ github.com/openstack-k8s-operators/keystone-operator/api v0.3.1-0.20240216173228
 github.com/openstack-k8s-operators/keystone-operator/api v0.3.1-0.20240216173228-eec429bcc776/go.mod h1:bfDpzoPV6K8Zrl4wFN0pubw5c3wvsNTl1ppvGmCdfKc=
 github.com/openstack-k8s-operators/lib-common/modules/certmanager v0.0.0-20240216173409-86913e6d5885 h1:30h+8BjebHiR6dm23ulEZJ5QNHev0YoVBBJTuJJLt1U=
 github.com/openstack-k8s-operators/lib-common/modules/certmanager v0.0.0-20240216173409-86913e6d5885/go.mod h1:v7EfD82TconjzYpNLAsRjYC2seEu/QFobEWA4zpEH9k=
-github.com/openstack-k8s-operators/lib-common/modules/common v0.3.1-0.20240216173409-86913e6d5885 h1:o7KZaxKt8Dr97ZJIBPW0P482gLyFEURKF89fizcJCBQ=
-github.com/openstack-k8s-operators/lib-common/modules/common v0.3.1-0.20240216173409-86913e6d5885/go.mod h1:bQwzyQtWCR9F0+IvWZ30J9d1lB6tcX3CNJ0Ten1smDw=
+github.com/openstack-k8s-operators/lib-common/modules/common v0.3.1-0.20240220172726-06e269f22402 h1:UNpz+VviGgrAGISBtB1u3sQfEUbzKcKfV7tCSN+c/Do=
+github.com/openstack-k8s-operators/lib-common/modules/common v0.3.1-0.20240220172726-06e269f22402/go.mod h1:oB0Lc1U5wiJZBdT3lSMkZfG/LhHR6z/SJ0Tp7Y/GUkg=
 github.com/openstack-k8s-operators/lib-common/modules/openstack v0.3.1-0.20240216173409-86913e6d5885 h1:g3wUugrt+GsQMtWdxQDzFXjY13U/FKLx1dVMMMJhQqA=
 github.com/openstack-k8s-operators/lib-common/modules/openstack v0.3.1-0.20240216173409-86913e6d5885/go.mod h1:8QsCFttAm+X6A8I8EQThGjNjeMAYt2hK7ivbvnR3434=
 github.com/openstack-k8s-operators/lib-common/modules/storage v0.3.1-0.20240216173409-86913e6d5885 h1:sMO+IYsZ91Nho0FV6y03J0NTGd8+ZWB4KmKJJU94gTU=
