@@ -16,7 +16,7 @@ require (
 	github.com/openstack-k8s-operators/glance-operator/api v0.3.1-0.20240216191912-f09285faf21b
 	github.com/openstack-k8s-operators/heat-operator/api v0.3.1-0.20240216110209-c405c043e280
 	github.com/openstack-k8s-operators/horizon-operator/api v0.3.1-0.20240217031606-5f5dac9bb5b7
-	github.com/openstack-k8s-operators/infra-operator/apis v0.3.1-0.20240218132212-ad757a2f5bab
+	github.com/openstack-k8s-operators/infra-operator/apis v0.3.1-0.20240219153539-99face71256b
 	github.com/openstack-k8s-operators/ironic-operator/api v0.3.1-0.20240216150409-296d5c6420a5
 	github.com/openstack-k8s-operators/keystone-operator/api v0.3.1-0.20240216173228-eec429bcc776
 	github.com/openstack-k8s-operators/lib-common/modules/certmanager v0.0.0-20240216173409-86913e6d5885
