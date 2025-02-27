@@ -299,6 +299,11 @@ func (in *ContainerTemplate) DeepCopyInto(out *ContainerTemplate) {
 		*out = new(string)
 		**out = **in
 	}
+	if in.BootcOsContainerImage != nil {
+		in, out := &in.BootcOsContainerImage, &out.BootcOsContainerImage
+		*out = new(string)
+		**out = **in
+	}
 	if in.CeilometerCentralImage != nil {
 		in, out := &in.CeilometerCentralImage, &out.CeilometerCentralImage
 		*out = new(string)
