@@ -76,7 +76,6 @@ func (a *EEJob) JobForOpenStackAnsibleEE(h *helper.Helper) (*batchv1.Job, error)
 		CustomInventory string = "/runner/inventory/inventory.yaml"
 	)
 
-	ls := labelsForOpenStackAnsibleEE(a.Labels)
 	if err := a.buildContainerArgs(CustomPlaybook); err != nil {
 		return nil, err
 	}
@@ -92,24 +91,7 @@ func (a *EEJob) JobForOpenStackAnsibleEE(h *helper.Helper) (*batchv1.Job, error)
 		podSpec.DNSPolicy = "None"
 	}
 
-	job := &batchv1.Job{
-		ObjectMeta: metav1.ObjectMeta{
-			Name:        a.Name,
-			Namespace:   a.Namespace,
-			Annotations: a.Annotations,
-			Labels:      ls,
-		},
-		Spec: batchv1.JobSpec{
-			BackoffLimit: a.BackoffLimit,
-			Template: corev1.PodTemplateSpec{
-				ObjectMeta: metav1.ObjectMeta{
-					Annotations: a.Annotations,
-					Labels:      ls,
-				},
-				Spec: podSpec,
-			},
-		},
-	}
+	job := a.buildJobSpec(podSpec)
 
 	// Populate hash
 	hashes := make(map[string]string)
@@ -334,5 +316,29 @@ func (a *EEJob) buildPodSpec() corev1.PodSpec {
 			Args:            a.Args,
 			Env:             a.Env,
 		}},
+	}
+}
+
+func (a *EEJob) buildJobSpec(podSpec corev1.PodSpec) *batchv1.Job {
+
+	ls := labelsForOpenStackAnsibleEE(a.Labels)
+
+	return &batchv1.Job{
+		ObjectMeta: metav1.ObjectMeta{
+			Name:        a.Name,
+			Namespace:   a.Namespace,
+			Annotations: a.Annotations,
+			Labels:      ls,
+		},
+		Spec: batchv1.JobSpec{
+			BackoffLimit: a.BackoffLimit,
+			Template: corev1.PodTemplateSpec{
+				ObjectMeta: metav1.ObjectMeta{
+					Annotations: a.Annotations,
+					Labels:      ls,
+				},
+				Spec: podSpec,
+			},
+		},
 	}
 }
