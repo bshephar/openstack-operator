@@ -81,16 +81,7 @@ func (a *EEJob) JobForOpenStackAnsibleEE(h *helper.Helper) (*batchv1.Job, error)
 		return nil, err
 	}
 
-	podSpec := corev1.PodSpec{
-		RestartPolicy: corev1.RestartPolicyNever,
-		Containers: []corev1.Container{{
-			ImagePullPolicy: corev1.PullAlways,
-			Image:           a.Image,
-			Name:            a.Name,
-			Args:            a.Args,
-			Env:             a.Env,
-		}},
-	}
+	podSpec := a.buildPodSpec()
 
 	if a.NodeSelector != nil && len(a.NodeSelector) > 0 {
 		podSpec.NodeSelector = a.NodeSelector
@@ -300,6 +291,7 @@ func calculateHash(envVar string) (string, error) {
 
 func (a *EEJob) buildContainerArgs(CustomPlaybook string) error {
 
+	var err error
 	args := a.Args
 
 	if len(args) == 0 {
@@ -328,5 +320,19 @@ func (a *EEJob) buildContainerArgs(CustomPlaybook string) error {
 
 	a.Args = args
 
-	return nil
+	return err
+}
+
+func (a *EEJob) buildPodSpec() corev1.PodSpec {
+
+	return corev1.PodSpec{
+		RestartPolicy: corev1.RestartPolicyNever,
+		Containers: []corev1.Container{{
+			ImagePullPolicy: corev1.PullAlways,
+			Image:           a.Image,
+			Name:            a.Name,
+			Args:            a.Args,
+			Env:             a.Env,
+		}},
+	}
 }
