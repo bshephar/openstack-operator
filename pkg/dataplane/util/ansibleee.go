@@ -77,31 +77,8 @@ func (a *EEJob) JobForOpenStackAnsibleEE(h *helper.Helper) (*batchv1.Job, error)
 	)
 
 	ls := labelsForOpenStackAnsibleEE(a.Labels)
-
-	args := a.Args
-
-	if len(args) == 0 {
-		artifact := a.Playbook
-		param := "-p"
-		if len(artifact) == 0 {
-			if len(a.PlaybookContents) > 0 {
-				artifact = CustomPlaybook
-			} else if len(a.Role) > 0 {
-				artifact = a.Role
-				param = "-r"
-			} else {
-				return nil, fmt.Errorf("no playbook, playbookContents or role specified")
-			}
-		}
-		args = []string{"ansible-runner", "run", "/runner", param, artifact}
-	}
-
-	// ansible runner identifier
-	// if the flag is set we use resource name as an argument
-	// https://ansible-runner.readthedocs.io/en/stable/intro/#artifactdir
-	if !(util.StringInSlice("-i", args) || util.StringInSlice("--ident", args)) {
-		identifier := a.Name
-		args = append(args, []string{"-i", identifier}...)
+	if err := a.buildContainerArgs(CustomPlaybook); err != nil {
+		return nil, err
 	}
 
 	podSpec := corev1.PodSpec{
@@ -110,7 +87,7 @@ func (a *EEJob) JobForOpenStackAnsibleEE(h *helper.Helper) (*batchv1.Job, error)
 			ImagePullPolicy: corev1.PullAlways,
 			Image:           a.Image,
 			Name:            a.Name,
-			Args:            args,
+			Args:            a.Args,
 			Env:             a.Env,
 		}},
 	}
@@ -319,4 +296,37 @@ func calculateHash(envVar string) (string, error) {
 		return "", err
 	}
 	return hash, nil
+}
+
+func (a *EEJob) buildContainerArgs(CustomPlaybook string) error {
+
+	args := a.Args
+
+	if len(args) == 0 {
+		artifact := a.Playbook
+		param := "-p"
+		if len(artifact) == 0 {
+			if len(a.PlaybookContents) > 0 {
+				artifact = CustomPlaybook
+			} else if len(a.Role) > 0 {
+				artifact = a.Role
+				param = "-r"
+			} else {
+				return fmt.Errorf("no playbook, playbookContents or role specified")
+			}
+		}
+		args = []string{"ansible-runner", "run", "/runner", param, artifact}
+	}
+
+	// ansible runner identifier
+	// if the flag is set we use resource name as an argument
+	// https://ansible-runner.readthedocs.io/en/stable/intro/#artifactdir
+	if !(util.StringInSlice("-i", args) || util.StringInSlice("--ident", args)) {
+		identifier := a.Name
+		args = append(args, []string{"-i", identifier}...)
+	}
+
+	a.Args = args
+
+	return nil
 }
