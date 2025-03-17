@@ -152,6 +152,8 @@ func GenerateNodeSetInventory(ctx context.Context, helper *helper.Helper,
 
 	nodeSetGroup.Vars["ansible_ssh_private_key_file"] = fmt.Sprintf("/runner/env/ssh_key/ssh_key_%s", instance.Name)
 
+	nodeSetGroup.Vars["edpm_bootc_os_container_image"] = dataplanev1.ContainerImageDefaults.BootcOsContainerImage
+
 	for _, node := range instance.Spec.Nodes {
 		host := nodeSetGroup.AddHost(strings.Split(node.HostName, ".")[0])
 		hostVars, err := getAnsibleVarsFrom(ctx, helper, instance.Namespace, &node.Ansible)
