@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  creationTimestamp: null
+  labels:
+    app.kubernetes.io/component: webhook
+    app.kubernetes.io/created-by: nova-operator
+    app.kubernetes.io/instance: webhook-service
+    app.kubernetes.io/managed-by: kustomize
+    app.kubernetes.io/name: service
+    app.kubernetes.io/part-of: nova-operator
+  name: nova-operator-webhook-service
+spec:
+  ports:
+  - port: 443
+    protocol: TCP
+    targetPort: 9444
+  selector:
+    openstack.org/operator-name: nova
+status:
+  loadBalancer: {}

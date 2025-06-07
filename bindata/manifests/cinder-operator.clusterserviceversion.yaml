@@ -1,0 +1,712 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "cinder.openstack.org/v1beta1",
+          "kind": "Cinder",
+          "metadata": {
+            "name": "cinder",
+            "namespace": "openstack"
+          },
+          "spec": {
+            "cinderAPI": {},
+            "cinderBackup": {},
+            "cinderScheduler": {},
+            "cinderVolumes": {
+              "volume1": {}
+            },
+            "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+            "databaseAccount": "cinder",
+            "databaseInstance": "openstack",
+            "rabbitMqClusterName": "rabbitmq",
+            "secret": "cinder-secret",
+            "serviceUser": "cinder"
+          }
+        },
+        {
+          "apiVersion": "cinder.openstack.org/v1beta1",
+          "kind": "CinderAPI",
+          "metadata": {
+            "name": "cinderapi-sample"
+          },
+          "spec": null
+        },
+        {
+          "apiVersion": "cinder.openstack.org/v1beta1",
+          "kind": "CinderBackup",
+          "metadata": {
+            "name": "cinderbackup-sample"
+          },
+          "spec": null
+        },
+        {
+          "apiVersion": "cinder.openstack.org/v1beta1",
+          "kind": "CinderScheduler",
+          "metadata": {
+            "name": "cinderscheduler-sample"
+          },
+          "spec": null
+        },
+        {
+          "apiVersion": "cinder.openstack.org/v1beta1",
+          "kind": "CinderVolume",
+          "metadata": {
+            "name": "cindervolume-sample"
+          },
+          "spec": null
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-06-05T09:34:58Z"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/operator-type: non-standalone
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: cinder-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: CinderAPI is the Schema for the cinderapis API
+        displayName: Cinder API
+        kind: CinderAPI
+        name: cinderapis.cinder.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: CinderBackup is the Schema for the cinderbackups API
+        displayName: Cinder Backup
+        kind: CinderBackup
+        name: cinderbackups.cinder.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: Cinder is the Schema for the cinders API
+        displayName: Cinder
+        kind: Cinder
+        name: cinders.cinder.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: cinderAPI.tls
+        version: v1beta1
+      - description: CinderScheduler is the Schema for the cinderschedulers API
+        displayName: Cinder Scheduler
+        kind: CinderScheduler
+        name: cinderschedulers.cinder.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: CinderVolume is the Schema for the cindervolumes API
+        displayName: Cinder Volume
+        kind: CinderVolume
+        name: cindervolumes.cinder.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+  description: Cinder Operator
+  displayName: Cinder Operator
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - statefulsets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - cronjobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinderapis
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinderapis/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinderapis/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinderbackups
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinderbackups/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinderbackups/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinders
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinders/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinders/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinderschedulers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinderschedulers/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cinderschedulers/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cindervolumes
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cindervolumes/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - cinder.openstack.org
+              resources:
+                - cindervolumes/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - get
+                - list
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - k8s.cni.cncf.io
+              resources:
+                - network-attachment-definitions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneapis
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneendpoints
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneservices
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbdatabases
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - memcached.openstack.org
+              resources:
+                - memcacheds
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - transporturls
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - rolebindings
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - roles
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+                - privileged
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - topology.openstack.org
+              resources:
+                - topologies
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: cinder-operator-controller-manager
+      deployments:
+        - label:
+            control-plane: controller-manager
+            openstack.org/operator-name: cinder
+          name: cinder-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                openstack.org/operator-name: cinder
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+                  openstack.org/operator-name: cinder
+              spec:
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                    image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    env:
+                      - name: RELATED_IMAGE_CINDER_API_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-cinder-api@sha256:f67a0862bb5c773ff8c63b3aa2966dc69ae315e84531cd88a841248474604b9e
+                      - name: RELATED_IMAGE_CINDER_BACKUP_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-cinder-backup@sha256:18e0bd0b66938f6621fc265e72263245eff63da119131182818b5a4a4960b194
+                      - name: RELATED_IMAGE_CINDER_SCHEDULER_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-cinder-scheduler@sha256:5ee9909d1c01864ab0ce3f96a7249dfbbc7c3e8d87d0846b5b209890e71b5306
+                      - name: RELATED_IMAGE_CINDER_VOLUME_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-cinder-volume@sha256:0b92efb75a055096b0e2f831680ab8c8a2be9398a80e59a8c2e7188ac1bf5208
+                    image: quay.io/openstack-k8s-operators/cinder-operator@sha256:82c2bb0fe4118aa8361f47b4102bca6aca10d2ad659a0b6e3d37fbdeebfcda6a
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: cert
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: cinder-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: cert
+                    secret:
+                      defaultMode: 420
+                      secretName: webhook-server-cert
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: cinder-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - OpenStack
+    - Block Storage
+    - Cinder
+  links:
+    - name: Cinder Operator
+      url: https://github.com/openstack-k8s-operators/cinder-operator
+  maturity: alpha
+  provider:
+    name: Red Hat
+    url: https://redhat.com
+  relatedImages:
+    - image: quay.io/podified-antelope-centos9/openstack-cinder-api@sha256:f67a0862bb5c773ff8c63b3aa2966dc69ae315e84531cd88a841248474604b9e
+      name: cinder-api-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-cinder-backup@sha256:18e0bd0b66938f6621fc265e72263245eff63da119131182818b5a4a4960b194
+      name: cinder-backup-image-url-default
+    - image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+      name: kube-rbac-proxy
+    - image: quay.io/podified-antelope-centos9/openstack-cinder-backup@sha256:18e0bd0b66938f6621fc265e72263245eff63da119131182818b5a4a4960b194
+      name: cinder_backup_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-cinder-scheduler@sha256:5ee9909d1c01864ab0ce3f96a7249dfbbc7c3e8d87d0846b5b209890e71b5306
+      name: cinder-scheduler-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-cinder-volume@sha256:0b92efb75a055096b0e2f831680ab8c8a2be9398a80e59a8c2e7188ac1bf5208
+      name: cinder-volume-image-url-default
+    - image: quay.io/openstack-k8s-operators/cinder-operator@sha256:82c2bb0fe4118aa8361f47b4102bca6aca10d2ad659a0b6e3d37fbdeebfcda6a
+      name: manager
+    - image: quay.io/podified-antelope-centos9/openstack-cinder-api@sha256:f67a0862bb5c773ff8c63b3aa2966dc69ae315e84531cd88a841248474604b9e
+      name: cinder_api_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-cinder-scheduler@sha256:5ee9909d1c01864ab0ce3f96a7249dfbbc7c3e8d87d0846b5b209890e71b5306
+      name: cinder_scheduler_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-cinder-volume@sha256:0b92efb75a055096b0e2f831680ab8c8a2be9398a80e59a8c2e7188ac1bf5208
+      name: cinder_volume_image_url_default
+  version: 0.0.1
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: cinder-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mcinder.kb.io
+      rules:
+        - apiGroups:
+            - cinder.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - cinders
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-cinder-openstack-org-v1beta1-cinder
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: cinder-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vcinder.kb.io
+      rules:
+        - apiGroups:
+            - cinder.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - cinders
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-cinder-openstack-org-v1beta1-cinder

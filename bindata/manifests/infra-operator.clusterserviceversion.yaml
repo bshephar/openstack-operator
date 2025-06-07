@@ -1,0 +1,1507 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "instanceha.openstack.org/v1beta1",
+          "kind": "InstanceHa",
+          "metadata": {
+            "name": "instanceha"
+          },
+          "spec": {
+            "caBundleSecretName": "combined-ca-bundle"
+          }
+        },
+        {
+          "apiVersion": "memcached.openstack.org/v1beta1",
+          "kind": "Memcached",
+          "metadata": {
+            "name": "memcached"
+          },
+          "spec": {
+            "replicas": 1
+          }
+        },
+        {
+          "apiVersion": "network.openstack.org/v1beta1",
+          "kind": "BGPConfiguration",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "infra-operator",
+              "app.kubernetes.io/instance": "bgpconfiguration-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "bgpconfiguration",
+              "app.kubernetes.io/part-of": "infra-operator"
+            },
+            "name": "bgpconfiguration-sample"
+          },
+          "spec": {
+            "frrConfigurationNamespace": "metallb-system"
+          }
+        },
+        {
+          "apiVersion": "network.openstack.org/v1beta1",
+          "kind": "DNSData",
+          "metadata": {
+            "name": "allhosts"
+          },
+          "spec": {
+            "hosts": [
+              {
+                "hostnames": [
+                  "edpm-compute-0.ctlplane"
+                ],
+                "ip": "192.168.122.100"
+              },
+              {
+                "hostnames": [
+                  "edpm-compute-0.internalapi"
+                ],
+                "ip": "172.17.0.100"
+              },
+              {
+                "hostnames": [
+                  "edpm-compute-0.storage"
+                ],
+                "ip": "172.18.0.100"
+              },
+              {
+                "hostnames": [
+                  "edpm-compute-0.tenant"
+                ],
+                "ip": "172.19.0.100"
+              },
+              {
+                "hostnames": [
+                  "edpm-compute-1.ctlplane"
+                ],
+                "ip": "192.168.122.101"
+              },
+              {
+                "hostnames": [
+                  "edpm-compute-1.internalapi"
+                ],
+                "ip": "172.17.0.101"
+              },
+              {
+                "hostnames": [
+                  "edpm-compute-1.storage"
+                ],
+                "ip": "172.18.0.101"
+              },
+              {
+                "hostnames": [
+                  "edpm-compute-1.tenant"
+                ],
+                "ip": "172.19.0.101"
+              },
+              {
+                "hostnames": [
+                  "keystone-internal.openstack.svc",
+                  "placement-internal.openstack.svc",
+                  "cinder-internal.openstack.svc",
+                  "glance-internal.openstack.svc",
+                  "nova-internal.openstack.svc",
+                  "nova-metadata-internal.openstack.svc",
+                  "neutron-internal.openstack.svc"
+                ],
+                "ip": "172.17.0.80"
+              },
+              {
+                "hostnames": [
+                  "rabbitmq.openstack.svc"
+                ],
+                "ip": "172.17.0.85"
+              },
+              {
+                "hostnames": [
+                  "rabbitmq-cell1.openstack.svc"
+                ],
+                "ip": "172.17.0.86"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "network.openstack.org/v1beta1",
+          "kind": "DNSMasq",
+          "metadata": {
+            "name": "dnsmasq"
+          },
+          "spec": {
+            "debug": {
+              "service": false
+            },
+            "options": [
+              {
+                "key": "server",
+                "values": [
+                  "192.168.122.1"
+                ]
+              },
+              {
+                "key": "local",
+                "values": [
+                  "/example.com/"
+                ]
+              }
+            ],
+            "replicas": 1
+          }
+        },
+        {
+          "apiVersion": "network.openstack.org/v1beta1",
+          "kind": "IPSet",
+          "metadata": {
+            "name": "edpm-compute-0"
+          },
+          "spec": {
+            "networks": [
+              {
+                "defaultRoute": true,
+                "name": "CtlPlane",
+                "subnetName": "subnet1"
+              },
+              {
+                "name": "InternalApi",
+                "subnetName": "subnet1"
+              },
+              {
+                "name": "Storage",
+                "subnetName": "subnet1"
+              },
+              {
+                "name": "Tenant",
+                "subnetName": "subnet1"
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "network.openstack.org/v1beta1",
+          "kind": "NetConfig",
+          "metadata": {
+            "name": "netconfig"
+          },
+          "spec": {
+            "networks": [
+              {
+                "dnsDomain": "ctlplane.example.com",
+                "name": "ctlplane",
+                "subnets": [
+                  {
+                    "allocationRanges": [
+                      {
+                        "end": "192.168.122.120",
+                        "start": "192.168.122.100"
+                      },
+                      {
+                        "end": "192.168.122.200",
+                        "start": "192.168.122.150"
+                      }
+                    ],
+                    "cidr": "192.168.122.0/24",
+                    "gateway": "192.168.122.1",
+                    "name": "subnet1"
+                  }
+                ]
+              },
+              {
+                "dnsDomain": "internalapi.example.com",
+                "name": "internalapi",
+                "subnets": [
+                  {
+                    "allocationRanges": [
+                      {
+                        "end": "172.17.0.250",
+                        "start": "172.17.0.100"
+                      }
+                    ],
+                    "cidr": "172.17.0.0/24",
+                    "name": "subnet1",
+                    "vlan": 20
+                  }
+                ]
+              },
+              {
+                "dnsDomain": "external.example.com",
+                "name": "external",
+                "subnets": [
+                  {
+                    "allocationRanges": [
+                      {
+                        "end": "10.0.0.250",
+                        "start": "10.0.0.100"
+                      }
+                    ],
+                    "cidr": "10.0.0.0/24",
+                    "gateway": "10.0.0.1",
+                    "name": "subnet1"
+                  }
+                ]
+              },
+              {
+                "dnsDomain": "storage.example.com",
+                "name": "storage",
+                "subnets": [
+                  {
+                    "allocationRanges": [
+                      {
+                        "end": "172.18.0.250",
+                        "start": "172.18.0.100"
+                      }
+                    ],
+                    "cidr": "172.18.0.0/24",
+                    "name": "subnet1",
+                    "vlan": 21
+                  }
+                ]
+              },
+              {
+                "dnsDomain": "storagemgmt.example.com",
+                "name": "storagemgmt",
+                "subnets": [
+                  {
+                    "allocationRanges": [
+                      {
+                        "end": "172.20.0.250",
+                        "start": "172.20.0.100"
+                      }
+                    ],
+                    "cidr": "172.20.0.0/24",
+                    "name": "subnet1",
+                    "vlan": 23
+                  }
+                ]
+              },
+              {
+                "dnsDomain": "tenant.example.com",
+                "name": "tenant",
+                "subnets": [
+                  {
+                    "allocationRanges": [
+                      {
+                        "end": "172.19.0.250",
+                        "start": "172.19.0.100"
+                      }
+                    ],
+                    "cidr": "172.19.0.0/24",
+                    "name": "subnet1",
+                    "vlan": 22
+                  }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "apiVersion": "network.openstack.org/v1beta1",
+          "kind": "Reservation",
+          "metadata": {
+            "name": "edpm-compute-0"
+          },
+          "spec": {
+            "ipSetRef": {
+              "name": "edpm-compute-0",
+              "namespace": "openstack",
+              "uid": "56753ffb-e486-43ab-a79a-f85f27b2ac14"
+            },
+            "reservation": {
+              "CtlPlane": {
+                "address": "192.168.122.100",
+                "network": "CtlPlane",
+                "subnet": "subnet1"
+              },
+              "InternalApi": {
+                "address": "172.17.0.100",
+                "network": "InternalApi",
+                "subnet": "subnet1"
+              },
+              "Storage": {
+                "address": "172.18.0.100",
+                "network": "Storage",
+                "subnet": "subnet1"
+              },
+              "StorageMgmt": {
+                "address": "172.20.0.100",
+                "network": "StorageMgmt",
+                "subnet": "subnet1"
+              },
+              "Tenant": {
+                "address": "172.19.0.100",
+                "network": "Tenant",
+                "subnet": "subnet1"
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "rabbitmq.openstack.org/v1beta1",
+          "kind": "RabbitMq",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "infra-operator",
+              "app.kubernetes.io/instance": "rabbitmq-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "rabbitmq",
+              "app.kubernetes.io/part-of": "infra-operator"
+            },
+            "name": "rabbitmq-sample"
+          },
+          "spec": null
+        },
+        {
+          "apiVersion": "rabbitmq.openstack.org/v1beta1",
+          "kind": "TransportURL",
+          "metadata": {
+            "name": "transporturl"
+          },
+          "spec": {
+            "rabbitmqClusterName": "rabbitmq"
+          }
+        },
+        {
+          "apiVersion": "redis.openstack.org/v1beta1",
+          "kind": "Redis",
+          "metadata": {
+            "name": "redis"
+          },
+          "spec": {
+            "replicas": 1
+          }
+        },
+        {
+          "apiVersion": "topology.openstack.org/v1beta1",
+          "kind": "Topology",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "infra-operator",
+              "app.kubernetes.io/instance": "topology-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "topology",
+              "app.kubernetes.io/part-of": "infra-operator"
+            },
+            "name": "topology-sample"
+          },
+          "spec": null
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-06-01T11:34:18Z"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/operator-type: non-standalone
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: infra-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: BGPConfiguration is the Schema for the bgpconfigurations API
+        displayName: BGPConfiguration
+        kind: BGPConfiguration
+        name: bgpconfigurations.network.openstack.org
+        version: v1beta1
+      - description: DNSData is the Schema for the dnsdata API
+        displayName: DNSData
+        kind: DNSData
+        name: dnsdata.network.openstack.org
+        version: v1beta1
+      - description: DNSMasq is the Schema for the dnsmasqs API
+        displayName: DNSMasq
+        kind: DNSMasq
+        name: dnsmasqs.network.openstack.org
+        version: v1beta1
+      - description: InstanceHa is the Schema for the instancehas API
+        displayName: Instance Ha
+        kind: InstanceHa
+        name: instancehas.instanceha.openstack.org
+        version: v1beta1
+      - description: IPSet is the Schema for the ipsets API
+        displayName: IPSet
+        kind: IPSet
+        name: ipsets.network.openstack.org
+        version: v1beta1
+      - description: Memcached is the Schema for the memcacheds API
+        displayName: Memcached
+        kind: Memcached
+        name: memcacheds.memcached.openstack.org
+        specDescriptors:
+          - description: TLS settings for memcached service
+            displayName: TLS
+            path: tls
+          - description: Name of the secret containing the client cert used to perform mtls auth
+            displayName: Auth Cert Secret
+            path: tls.mtls.authCertSecret
+        version: v1beta1
+      - description: NetConfig is the Schema for the netconfigs API
+        displayName: Net Config
+        kind: NetConfig
+        name: netconfigs.network.openstack.org
+        version: v1beta1
+      - description: RabbitMq is the Schema for the rabbitmqs API
+        displayName: Rabbit Mq
+        kind: RabbitMq
+        name: rabbitmqs.rabbitmq.openstack.org
+        specDescriptors:
+          - description: NodeSelector to target subset of worker nodes running this service
+            displayName: Node Selector
+            path: nodeSelector
+        version: v1beta1
+      - description: Redis is the Schema for the redises API
+        displayName: Redis
+        kind: Redis
+        name: redises.redis.openstack.org
+        specDescriptors:
+          - description: TLS settings for Redis service and internal Redis replication
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: Reservation is the Schema for the reservations API
+        displayName: Reservation
+        kind: Reservation
+        name: reservations.network.openstack.org
+        version: v1beta1
+      - kind: Topology
+        name: topologies.topology.openstack.org
+        version: v1beta1
+      - description: TransportURL is the Schema for the transporturls API
+        displayName: Transport URL
+        kind: TransportURL
+        name: transporturls.rabbitmq.openstack.org
+        version: v1beta1
+  description: OpenStack Infrastructure
+  displayName: OpenStack Infra
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - statefulsets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - config.openshift.io
+              resources:
+                - networks
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods/exec
+              verbs:
+                - create
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - frrk8s.metallb.io
+              resources:
+                - frrconfigurations
+              verbs:
+                - create
+                - delete
+                - deletecollection
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - instanceha.openstack.org
+              resources:
+                - instancehas
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - instanceha.openstack.org
+              resources:
+                - instancehas/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - instanceha.openstack.org
+              resources:
+                - instancehas/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - k8s.cni.cncf.io
+              resources:
+                - network-attachment-definitions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - memcached.openstack.org
+              resources:
+                - memcacheds
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - memcached.openstack.org
+              resources:
+                - memcacheds/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - memcached.openstack.org
+              resources:
+                - memcacheds/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - bgpconfigurations
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - bgpconfigurations/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - bgpconfigurations/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - dnsdata
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - dnsdata/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - dnsdata/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - dnsdatas
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - dnsmasqs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - dnsmasqs/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - dnsmasqs/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - ipsets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - ipsets/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - ipsets/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - netconfigs
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - reservations
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - reservations/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - services/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - services/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - rabbitmq.com
+              resources:
+                - rabbitmqclusters
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - rabbitmqs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - rabbitmqs/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - rabbitmqs/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - transporturls
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - transporturls/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - transporturls/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - rolebindings
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - roles
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - redis.openstack.org
+              resources:
+                - redises
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - redis.openstack.org
+              resources:
+                - redises/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - redis.openstack.org
+              resources:
+                - redises/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - topology.openstack.org
+              resources:
+                - topologies
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: infra-operator-controller-manager
+      deployments:
+        - label:
+            app.kubernetes.io/component: manager
+            app.kubernetes.io/created-by: infra-operator
+            app.kubernetes.io/instance: controller-manager
+            app.kubernetes.io/managed-by: kustomize
+            app.kubernetes.io/name: deployment
+            app.kubernetes.io/part-of: infra-operator
+            control-plane: controller-manager
+            openstack.org/operator-name: infra
+          name: infra-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                openstack.org/operator-name: infra
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+                  openstack.org/operator-name: infra
+              spec:
+                affinity:
+                  nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      nodeSelectorTerms:
+                        - matchExpressions:
+                            - key: kubernetes.io/arch
+                              operator: In
+                              values:
+                                - amd64
+                                - arm64
+                                - ppc64le
+                                - s390x
+                            - key: kubernetes.io/os
+                              operator: In
+                              values:
+                                - linux
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                    image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    env:
+                      - name: RELATED_IMAGE_INFRA_MEMCACHED_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-memcached@sha256:83b7d261083257b382f78e0a1190dd2c8d2e46c8d14dabd0ebb81c8c9be9fb4a
+                      - name: RELATED_IMAGE_INFRA_REDIS_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-redis@sha256:b69a9f32f802207c78e330ed748435acf24238551182deaa3b5445cf1534cf32
+                      - name: RELATED_IMAGE_INFRA_DNSMASQ_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-neutron-server@sha256:72543f6dcd6d694a0ac29653db240b242decbfbb794e9777f5c9e47fec536c64
+                      - name: RELATED_IMAGE_INSTANCE_HA_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-openstackclient@sha256:b1217aba416f3cc36a0f75b7903191d28720acb96ca480231da73eb6dc5a09e0
+                    image: quay.io/openstack-k8s-operators/infra-operator@sha256:0dd27821f0cf9de77f407662d64c69dc9b0f22e944bfbf03cb4f8805dc9e21c9
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: cert
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: infra-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: cert
+                    secret:
+                      defaultMode: 420
+                      secretName: webhook-server-cert
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: infra-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - OpenStack
+    - Infrastructure
+  links:
+    - name: Infra Operator
+      url: https://github.com/openstack-k8s-operators/infra-operator
+  maturity: beta
+  provider:
+    name: Red Hat Inc.
+    url: https://redhat.com/
+  relatedImages:
+    - image: quay.io/podified-antelope-centos9/openstack-memcached@sha256:83b7d261083257b382f78e0a1190dd2c8d2e46c8d14dabd0ebb81c8c9be9fb4a
+      name: infra-memcached-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-neutron-server@sha256:72543f6dcd6d694a0ac29653db240b242decbfbb794e9777f5c9e47fec536c64
+      name: infra-dnsmasq-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-openstackclient@sha256:b1217aba416f3cc36a0f75b7903191d28720acb96ca480231da73eb6dc5a09e0
+      name: instance-ha-image-url-default
+    - image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+      name: kube-rbac-proxy
+    - image: quay.io/podified-antelope-centos9/openstack-redis@sha256:b69a9f32f802207c78e330ed748435acf24238551182deaa3b5445cf1534cf32
+      name: infra_redis_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-neutron-server@sha256:72543f6dcd6d694a0ac29653db240b242decbfbb794e9777f5c9e47fec536c64
+      name: infra_dnsmasq_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-redis@sha256:b69a9f32f802207c78e330ed748435acf24238551182deaa3b5445cf1534cf32
+      name: infra-redis-image-url-default
+    - image: quay.io/openstack-k8s-operators/infra-operator@sha256:0dd27821f0cf9de77f407662d64c69dc9b0f22e944bfbf03cb4f8805dc9e21c9
+      name: manager
+    - image: quay.io/podified-antelope-centos9/openstack-memcached@sha256:83b7d261083257b382f78e0a1190dd2c8d2e46c8d14dabd0ebb81c8c9be9fb4a
+      name: infra_memcached_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-openstackclient@sha256:b1217aba416f3cc36a0f75b7903191d28720acb96ca480231da73eb6dc5a09e0
+      name: instance_ha_image_url_default
+  version: 0.0.1
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mdnsmasq.kb.io
+      rules:
+        - apiGroups:
+            - network.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - dnsmasqs
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-network-openstack-org-v1beta1-dnsmasq
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: minstanceha.kb.io
+      rules:
+        - apiGroups:
+            - client.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - instancehas
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-client-openstack-org-v1beta1-instanceha
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mipset.kb.io
+      rules:
+        - apiGroups:
+            - network.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - ipsets
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-network-openstack-org-v1beta1-ipset
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mmemcached.kb.io
+      rules:
+        - apiGroups:
+            - memcached.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - memcacheds
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-memcached-openstack-org-v1beta1-memcached
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mnetconfig.kb.io
+      rules:
+        - apiGroups:
+            - network.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - netconfigs
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-network-openstack-org-v1beta1-netconfig
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mrabbitmq.kb.io
+      rules:
+        - apiGroups:
+            - rabbitmq.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - rabbitmqs
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-rabbitmq-openstack-org-v1beta1-rabbitmq
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mredis.kb.io
+      rules:
+        - apiGroups:
+            - redis.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - redises
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-redis-openstack-org-v1beta1-redis
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mreservation.kb.io
+      rules:
+        - apiGroups:
+            - network.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - reservations
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-network-openstack-org-v1beta1-reservation
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vdnsmasq.kb.io
+      rules:
+        - apiGroups:
+            - network.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - dnsmasqs
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-network-openstack-org-v1beta1-dnsmasq
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vinstanceha.kb.io
+      rules:
+        - apiGroups:
+            - client.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - instancehas
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-client-openstack-org-v1beta1-instanceha
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vipset.kb.io
+      rules:
+        - apiGroups:
+            - network.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - ipsets
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-network-openstack-org-v1beta1-ipset
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vmemcached.kb.io
+      rules:
+        - apiGroups:
+            - memcached.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - memcacheds
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-memcached-openstack-org-v1beta1-memcached
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vnetconfig.kb.io
+      rules:
+        - apiGroups:
+            - network.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+            - DELETE
+          resources:
+            - netconfigs
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-network-openstack-org-v1beta1-netconfig
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vrabbitmq.kb.io
+      rules:
+        - apiGroups:
+            - rabbitmq.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - rabbitmqs
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-rabbitmq-openstack-org-v1beta1-rabbitmq
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vredis.kb.io
+      rules:
+        - apiGroups:
+            - redis.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - redises
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-redis-openstack-org-v1beta1-redis
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: infra-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vreservation.kb.io
+      rules:
+        - apiGroups:
+            - network.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - reservations
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-network-openstack-org-v1beta1-reservation

@@ -1,0 +1,1216 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "nova.openstack.org/v1beta1",
+          "kind": "Nova",
+          "metadata": {
+            "name": "nova"
+          },
+          "spec": {
+            "secret": "osp-secret"
+          }
+        },
+        {
+          "apiVersion": "nova.openstack.org/v1beta1",
+          "kind": "NovaAPI",
+          "metadata": {
+            "name": "novaapi-sample"
+          },
+          "spec": {
+            "apiDatabaseHostname": "openstack",
+            "cell0DatabaseHostname": "openstack",
+            "keystoneAuthURL": "http://keystone-public-openstack.apps-crc.testing",
+            "memcachedInstance": "memcached",
+            "registeredCells": {},
+            "secret": "osp-secret",
+            "serviceAccount": "nova"
+          }
+        },
+        {
+          "apiVersion": "nova.openstack.org/v1beta1",
+          "kind": "NovaCell",
+          "metadata": {
+            "name": "novacell1-with-upcall-sample"
+          },
+          "spec": {
+            "apiDatabaseHostname": "openstack",
+            "cellDatabaseHostname": "openstack",
+            "cellName": "cell1",
+            "keystoneAuthURL": "http://keystone-public-openstack.apps-crc.testing",
+            "memcachedInstance": "memcached",
+            "secret": "osp-secret",
+            "serviceAccount": "nova"
+          }
+        },
+        {
+          "apiVersion": "nova.openstack.org/v1beta1",
+          "kind": "NovaCompute",
+          "metadata": {
+            "name": "nova-compute-ironic"
+          },
+          "spec": {
+            "novaComputeTemplates": {
+              "compute-ironic": {
+                "computeDriver": "ironic.IronicDriver",
+                "customServiceConfig": "",
+                "networkAttachments": [
+                  "internalapi"
+                ],
+                "replicas": 1,
+                "resources": {}
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "nova.openstack.org/v1beta1",
+          "kind": "NovaConductor",
+          "metadata": {
+            "name": "novaconductor-sample"
+          },
+          "spec": {
+            "cellName": "cell1",
+            "keystoneAuthURL": "http://keystone-public-openstack.apps-crc.testing",
+            "memcachedInstance": "memcached",
+            "secret": "osp-secret",
+            "serviceAccount": "nova"
+          }
+        },
+        {
+          "apiVersion": "nova.openstack.org/v1beta1",
+          "kind": "NovaMetadata",
+          "metadata": {
+            "name": "novametadata-sample"
+          },
+          "spec": {
+            "apiDatabaseAccount": "nova-api",
+            "apiDatabaseHostname": "openstack",
+            "cellDatabaseAccount": "nova-cell0",
+            "cellDatabaseHostname": "openstack",
+            "keystoneAuthURL": "http://keystone-public-openstack.apps-crc.testing",
+            "memcachedInstance": "memcached",
+            "registeredCells": {},
+            "secret": "osp-secret",
+            "serviceAccount": "nova"
+          }
+        },
+        {
+          "apiVersion": "nova.openstack.org/v1beta1",
+          "kind": "NovaNoVNCProxy",
+          "metadata": {
+            "name": "novanovncproxy-sample"
+          },
+          "spec": null
+        },
+        {
+          "apiVersion": "nova.openstack.org/v1beta1",
+          "kind": "NovaScheduler",
+          "metadata": {
+            "name": "novascheduler-sample"
+          },
+          "spec": {
+            "apiDatabaseHostname": "openstack",
+            "cell0DatabaseHostname": "openstack",
+            "customServiceConfig": "[DEFAULT]\ndebug=true\n",
+            "keystoneAuthURL": "http://keystone-public-openstack.apps-crc.testing",
+            "memcachedInstance": "memcached",
+            "registeredCells": {},
+            "secret": "osp-secret",
+            "serviceAccount": "nova"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-05-28T13:44:45Z"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/suggested-namespace: openstack
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/operator-type: non-standalone
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: nova-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - kind: Nova
+        name: nova.nova.openstack.org
+        version: v1beta1
+      - description: NovaAPI is the Schema for the novaapis API
+        displayName: Nova API
+        kind: NovaAPI
+        name: novaapis.nova.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: NovaCell is the Schema for the novacells API
+        displayName: Nova Cell
+        kind: NovaCell
+        name: novacells.nova.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: metadataServiceTemplate.tls
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: noVNCProxyServiceTemplate.tls
+          - description: Service - Cert secret used for the nova novnc service endpoint
+            displayName: Service
+            path: noVNCProxyServiceTemplate.tls.service
+          - description: Vencrypt - cert secret containing the x509 certificate to be presented to the VNC server. The CommonName field should match the primary hostname of the controller node. If using a HA deployment, the Organization field can also be configured to a value that is common across all console proxy instances in the deployment. https://docs.openstack.org/nova/latest/admin/remote-console-access.html#novnc-proxy-server-configuration
+            displayName: Vencrypt
+            path: noVNCProxyServiceTemplate.tls.vencrypt
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: NovaCompute is the Schema for the NovaCompute
+        displayName: Nova Compute
+        kind: NovaCompute
+        name: novacomputes.nova.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: NovaConductor is the Schema for the novaconductors API
+        displayName: Nova Conductor
+        kind: NovaConductor
+        name: novaconductors.nova.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: NovaMetadata is the Schema for the novametadata API
+        displayName: Nova Metadata
+        kind: NovaMetadata
+        name: novametadata.nova.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: NovaNoVNCProxy is the Schema for the novanovncproxies API
+        displayName: Nova No VNCProxy
+        kind: NovaNoVNCProxy
+        name: novanovncproxies.nova.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+          - description: Service - Cert secret used for the nova novnc service endpoint
+            displayName: Service
+            path: tls.service
+          - description: Vencrypt - cert secret containing the x509 certificate to be presented to the VNC server. The CommonName field should match the primary hostname of the controller node. If using a HA deployment, the Organization field can also be configured to a value that is common across all console proxy instances in the deployment. https://docs.openstack.org/nova/latest/admin/remote-console-access.html#novnc-proxy-server-configuration
+            displayName: Vencrypt
+            path: tls.vencrypt
+        version: v1beta1
+      - description: NovaScheduler is the Schema for the novaschedulers API
+        displayName: Nova Scheduler
+        kind: NovaScheduler
+        name: novaschedulers.nova.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+  description: Nova Operator
+  displayName: Nova Operator
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - statefulsets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - cronjobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - get
+                - list
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - k8s.cni.cncf.io
+              resources:
+                - network-attachment-definitions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneapis
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneendpoints
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneservices
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbdatabases
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbdatabases/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - memcached.openstack.org
+              resources:
+                - memcacheds
+              verbs:
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - memcached.openstack.org
+              resources:
+                - memcacheds/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - nova
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - nova/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - nova/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novaapis
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novaapis/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novaapis/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novacells
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novacells/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novacells/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novacomputes
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novacomputes/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novacomputes/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novaconductors
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novaconductors/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novaconductors/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novametadata
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novametadata/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novametadata/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novanovncproxies
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novanovncproxies/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novanovncproxies/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novaschedulers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novaschedulers/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - nova.openstack.org
+              resources:
+                - novaschedulers/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - transporturls
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - rolebindings
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - roles
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - route.openshift.io
+              resources:
+                - routes
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - topology.openstack.org
+              resources:
+                - topologies
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: nova-operator-controller-manager
+      deployments:
+        - label:
+            control-plane: controller-manager
+            openstack.org/operator-name: nova
+          name: nova-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                openstack.org/operator-name: nova
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+                  openstack.org/operator-name: nova
+              spec:
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                    image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    env:
+                      - name: RELATED_IMAGE_NOVA_API_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-nova-api@sha256:2efa7ec80a6212b261335e926cd68351970ede543e9e703b0d43bd9977e4a7dc
+                      - name: RELATED_IMAGE_NOVA_CONDUCTOR_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-nova-conductor@sha256:7522d5c3de8ab2f36e8434e595aabc18edc91e6b2d195ad871f2ba84aba1e5f4
+                      - name: RELATED_IMAGE_NOVA_NOVNC_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-nova-novncproxy@sha256:1d038a58a383504cd909232233e2077fa7f648d323d390465fbec33f7f5f123e
+                      - name: RELATED_IMAGE_NOVA_SCHEDULER_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-nova-scheduler@sha256:522e9463af2853b83be1c2c8b38e9c53a978605fe81cc1235e76d21c26af91d5
+                      - name: RELATED_IMAGE_NOVA_COMPUTE_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-nova-compute@sha256:6e8618072f47269ec55f50d2cc10f8dac8ecf39df7406b61c486aa5c9d70afc9
+                    image: quay.io/openstack-k8s-operators/nova-operator@sha256:9a664a8b267fbfda2ca02cabb06a92d8d90a08efd7596c2175752654a2c87027
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9444
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: cert
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: nova-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: cert
+                    secret:
+                      defaultMode: 420
+                      secretName: webhook-server-cert
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: nova-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - OpenStack
+    - Nova
+  links:
+    - name: Nova Operator
+      url: https://github.com/openstack-k8s-operators/nova-operator
+  maturity: beta
+  provider:
+    name: Red Hat Inc.
+    url: https://redhat.com/
+  relatedImages:
+    - image: quay.io/podified-antelope-centos9/openstack-nova-conductor@sha256:7522d5c3de8ab2f36e8434e595aabc18edc91e6b2d195ad871f2ba84aba1e5f4
+      name: nova_conductor_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-nova-novncproxy@sha256:1d038a58a383504cd909232233e2077fa7f648d323d390465fbec33f7f5f123e
+      name: nova_novnc_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-nova-conductor@sha256:7522d5c3de8ab2f36e8434e595aabc18edc91e6b2d195ad871f2ba84aba1e5f4
+      name: nova-conductor-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-nova-novncproxy@sha256:1d038a58a383504cd909232233e2077fa7f648d323d390465fbec33f7f5f123e
+      name: nova-novnc-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-nova-scheduler@sha256:522e9463af2853b83be1c2c8b38e9c53a978605fe81cc1235e76d21c26af91d5
+      name: nova-scheduler-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-nova-compute@sha256:6e8618072f47269ec55f50d2cc10f8dac8ecf39df7406b61c486aa5c9d70afc9
+      name: nova-compute-image-url-default
+    - image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+      name: kube-rbac-proxy
+    - image: quay.io/podified-antelope-centos9/openstack-nova-api@sha256:2efa7ec80a6212b261335e926cd68351970ede543e9e703b0d43bd9977e4a7dc
+      name: nova_api_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-nova-api@sha256:2efa7ec80a6212b261335e926cd68351970ede543e9e703b0d43bd9977e4a7dc
+      name: nova-api-image-url-default
+    - image: quay.io/openstack-k8s-operators/nova-operator@sha256:9a664a8b267fbfda2ca02cabb06a92d8d90a08efd7596c2175752654a2c87027
+      name: manager
+    - image: quay.io/podified-antelope-centos9/openstack-nova-scheduler@sha256:522e9463af2853b83be1c2c8b38e9c53a978605fe81cc1235e76d21c26af91d5
+      name: nova_scheduler_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-nova-compute@sha256:6e8618072f47269ec55f50d2cc10f8dac8ecf39df7406b61c486aa5c9d70afc9
+      name: nova_compute_image_url_default
+  version: 0.0.1
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mnova.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - nova
+      sideEffects: None
+      targetPort: 9444
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-nova-openstack-org-v1beta1-nova
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mnovaapi.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novaapis
+      sideEffects: None
+      targetPort: 9444
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-nova-openstack-org-v1beta1-novaapi
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mnovacell.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novacells
+      sideEffects: None
+      targetPort: 9444
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-nova-openstack-org-v1beta1-novacell
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mnovacompute.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novacomputes
+      sideEffects: None
+      targetPort: 9444
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-nova-openstack-org-v1beta1-novacompute
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mnovaconductor.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novaconductors
+      sideEffects: None
+      targetPort: 9444
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-nova-openstack-org-v1beta1-novaconductor
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mnovametadata.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novametadata
+      sideEffects: None
+      targetPort: 9444
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-nova-openstack-org-v1beta1-novametadata
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mnovanovncproxy.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novanovncproxies
+      sideEffects: None
+      targetPort: 9444
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-nova-openstack-org-v1beta1-novanovncproxy
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mnovascheduler.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novaschedulers
+      sideEffects: None
+      targetPort: 9444
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-nova-openstack-org-v1beta1-novascheduler
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vnova.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - nova
+      sideEffects: None
+      targetPort: 9444
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-nova-openstack-org-v1beta1-nova
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vnovaapi.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novaapis
+      sideEffects: None
+      targetPort: 9444
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-nova-openstack-org-v1beta1-novaapi
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vnovacell.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novacells
+      sideEffects: None
+      targetPort: 9444
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-nova-openstack-org-v1beta1-novacell
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vnovacompute.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novacomputes
+      sideEffects: None
+      targetPort: 9444
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-nova-openstack-org-v1beta1-novacompute
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vnovaconductor.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novaconductors
+      sideEffects: None
+      targetPort: 9444
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-nova-openstack-org-v1beta1-novaconductor
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vnovametadata.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novametadata
+      sideEffects: None
+      targetPort: 9444
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-nova-openstack-org-v1beta1-novametadata
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vnovanovncproxy.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novanovncproxies
+      sideEffects: None
+      targetPort: 9444
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-nova-openstack-org-v1beta1-novanovncproxy
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: nova-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vnovascheduler.kb.io
+      rules:
+        - apiGroups:
+            - nova.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - novaschedulers
+      sideEffects: None
+      targetPort: 9444
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-nova-openstack-org-v1beta1-novascheduler

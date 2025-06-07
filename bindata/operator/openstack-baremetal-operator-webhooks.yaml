@@ -69,26 +69,7 @@ metadata:
     app.kubernetes.io/part-of: openstack-baremetal-operator
   name: openstack-baremetal-operator-mutating-webhook-configuration
 webhooks:
-- admissionReviewVersions:
-  - v1
-  failurePolicy: Fail
-  name: mopenstackprovisionserver.kb.io
-  rules:
-    - apiGroups:
-        - baremetal.openstack.org
-      apiVersions:
-      - v1beta1
-      operations:
-        - CREATE
-        - UPDATE
-      resources:
-        - openstackprovisionservers
-  sideEffects: None
-  clientConfig:
-    service:
-      name: openstack-baremetal-operator-webhook-service
-      namespace: '{{ .OperatorNamespace }}'
-      path: /mutate-baremetal-openstack-org-v1beta1-openstackprovisionserver
+
 ---
 apiVersion: admissionregistration.k8s.io/v1
 kind: ValidatingWebhookConfiguration
@@ -105,44 +86,4 @@ metadata:
     app.kubernetes.io/part-of: openstack-baremetal-operator
   name: openstack-baremetal-operator-validating-webhook-configuration
 webhooks:
-- admissionReviewVersions:
-  - v1
-  failurePolicy: Fail
-  name: vopenstackbaremetalset.kb.io
-  rules:
-    - apiGroups:
-        - baremetal.openstack.org
-      apiVersions:
-      - v1beta1
-      operations:
-        - CREATE
-        - UPDATE
-        - DELETE
-      resources:
-        - openstackbaremetalsets
-  sideEffects: None
-  clientConfig:
-    service:
-      name: openstack-baremetal-operator-webhook-service
-      namespace: '{{ .OperatorNamespace }}'
-      path: /validate-baremetal-openstack-org-v1beta1-openstackbaremetalset
-- admissionReviewVersions:
-  - v1
-  failurePolicy: Fail
-  name: vopenstackprovisionserver.kb.io
-  rules:
-    - apiGroups:
-        - baremetal.openstack.org
-      apiVersions:
-      - v1beta1
-      operations:
-        - CREATE
-        - UPDATE
-      resources:
-        - openstackprovisionservers
-  sideEffects: None
-  clientConfig:
-    service:
-      name: openstack-baremetal-operator-webhook-service
-      namespace: '{{ .OperatorNamespace }}'
-      path: /validate-baremetal-openstack-org-v1beta1-openstackprovisionserver
+

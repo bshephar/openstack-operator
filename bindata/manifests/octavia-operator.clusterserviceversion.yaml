@@ -1,0 +1,766 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "octavia.openstack.org/v1beta1",
+          "kind": "Octavia",
+          "metadata": {
+            "name": "octavia"
+          },
+          "spec": {
+            "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+            "databaseAccount": "octavia",
+            "databaseInstance": "openstack",
+            "lbMgmtNetwork": {
+              "availabilityZones": [
+                "zone-1"
+              ]
+            },
+            "octaviaAPI": {
+              "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+              "databaseAccount": "octavia",
+              "databaseInstance": "openstack",
+              "persistenceDatabaseAccount": "octavia-persistence",
+              "preserveJobs": false,
+              "secret": "osp-secret",
+              "serviceAccount": "octavia",
+              "serviceUser": "octavia"
+            },
+            "octaviaHealthManager": {
+              "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+              "databaseAccount": "octavia",
+              "databaseInstance": "openstack",
+              "networkAttachments": [
+                "octavia"
+              ],
+              "persistenceDatabaseAccount": "octavia-persistence",
+              "preserveJobs": false,
+              "role": "healthmanager",
+              "secret": "osp-secret",
+              "serviceAccount": "octavia",
+              "serviceUser": "octavia"
+            },
+            "octaviaHousekeeping": {
+              "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+              "databaseAccount": "octavia",
+              "databaseInstance": "openstack",
+              "networkAttachments": [
+                "octavia"
+              ],
+              "persistenceDatabaseAccount": "octavia-persistence",
+              "preserveJobs": false,
+              "role": "housekeeping",
+              "secret": "osp-secret",
+              "serviceAccount": "octavia",
+              "serviceUser": "octavia"
+            },
+            "octaviaWorker": {
+              "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+              "databaseAccount": "octavia",
+              "databaseInstance": "openstack",
+              "networkAttachments": [
+                "octavia"
+              ],
+              "persistenceDatabaseAccount": "octavia-persistence",
+              "preserveJobs": false,
+              "role": "worker",
+              "secret": "osp-secret",
+              "serviceAccount": "octavia",
+              "serviceUser": "octavia"
+            },
+            "persistenceDatabaseAccount": "octavia-persistence",
+            "preserveJobs": false,
+            "rabbitMqClusterName": "rabbitmq",
+            "secret": "osp-secret",
+            "serviceUser": "octavia"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-06-05T08:21:01Z"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/suggested-namespace: openstack
+    operators.openshift.io/infrastructure-features: '["disconnected"]'
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/operator-type: non-standalone
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: octavia-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - displayName: Octavia Amphora Controller
+        kind: OctaviaAmphoraController
+        name: octaviaamphoracontrollers.octavia.openstack.org
+        version: v1beta1
+      - description: OctaviaAPI is the Schema for the octaviaapis API
+        displayName: Octavia API
+        kind: OctaviaAPI
+        name: octaviaapis.octavia.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+          - description: API tls type which encapsulates for API services
+            displayName: API
+            path: tls.api
+          - description: Ovn GenericService - holds the secret for the OvnDb client cert
+            displayName: Ovn
+            path: tls.ovn
+        version: v1beta1
+      - kind: OctaviaRsyslog
+        name: octaviarsyslogs.octavia.openstack.org
+        version: v1beta1
+      - description: Octavia is the Schema for the octavia API
+        displayName: Octavia
+        kind: Octavia
+        name: octavias.octavia.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: octaviaAPI.tls
+          - description: API tls type which encapsulates for API services
+            displayName: API
+            path: octaviaAPI.tls.api
+          - description: Ovn GenericService - holds the secret for the OvnDb client cert
+            displayName: Ovn
+            path: octaviaAPI.tls.ovn
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: octaviaHealthManager.tls
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: octaviaHousekeeping.tls
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: octaviaWorker.tls
+        version: v1beta1
+  description: Octavia Operator
+  displayName: Octavia Operator
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - nodes
+              verbs:
+                - get
+                - list
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - daemonsets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - k8s.cni.cncf.io
+              resources:
+                - network-attachment-definitions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneapis
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneendpoints
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneservices
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbdatabases
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbdatabases/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octaviaamphoracontrollers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octaviaamphoracontrollers/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octaviaamphoracontrollers/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octaviaapis
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octaviaapis/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octaviaapis/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octaviarsyslogs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octaviarsyslogs/finalizers
+              verbs:
+                - update
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octaviarsyslogs/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octavias
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octavias/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - octavia.openstack.org
+              resources:
+                - octavias/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - ovn.openstack.org
+              resources:
+                - ovndbclusters
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - transporturls
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - rolebindings
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - roles
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - route.openshift.io
+              resources:
+                - routes
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+                - hostmount-anyuid
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+                - privileged
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - topology.openstack.org
+              resources:
+                - topologies
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: octavia-operator-controller-manager
+      deployments:
+        - label:
+            control-plane: controller-manager
+            openstack.org/operator-name: octavia
+          name: octavia-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                openstack.org/operator-name: octavia
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+                  openstack.org/operator-name: octavia
+              spec:
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                    image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                      runAsNonRoot: true
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    env:
+                      - name: RELATED_IMAGE_OCTAVIA_API_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-octavia-api@sha256:e78190f26f30b18a09949d32c584729d8a69a7a3e91657e3126ff2c310990ca2
+                      - name: RELATED_IMAGE_OCTAVIA_HOUSEKEEPING_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-octavia-housekeeping@sha256:4adac3758179c1a40ec51a49e3332d3b00a89097c9215448daed2479d4aa8ae1
+                      - name: RELATED_IMAGE_OCTAVIA_HEALTHMANAGER_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-octavia-health-manager@sha256:c9bdc9f401ea709624bf41d5cb128b6adf1e3de4a388f1b47b20200dd65d366b
+                      - name: RELATED_IMAGE_OCTAVIA_WORKER_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-octavia-worker@sha256:6f31471b0109b605e4927fc174ca5f45489a23d0858a812ab71f0c7a2065da1d
+                      - name: RELATED_IMAGE_OCTAVIA_APACHE_IMAGE_URL_DEFAULT
+                        value: registry.redhat.io/ubi9/httpd-24@sha256:8439671ecde9adff63df7e4ea8fc10c7cb95195e466cdbe021bac93e82fd245e
+                      - name: RELATED_IMAGE_OCTAVIA_RSYSLOG_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-rsyslog@sha256:62d2bfe8dd415ee88d573f013a958465fc30851631459a1748305aaf509532ef
+                    image: quay.io/openstack-k8s-operators/octavia-operator@sha256:852ad251fd02b5ffd89018239d0435d4e0ac8f7f372245d74f32ac5931bf6958
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: cert
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: octavia-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: cert
+                    secret:
+                      defaultMode: 420
+                      secretName: webhook-server-cert
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: octavia-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - OpenStack
+    - Load-Balancer
+    - Octavia
+  links:
+    - name: Octavia Operator
+      url: https://github.com/openstack-k8s-operators/octavia-operator
+  maturity: beta
+  provider:
+    name: Red Hat Inc.
+    url: https://redhat.com/
+  relatedImages:
+    - image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+      name: kube-rbac-proxy
+    - image: quay.io/podified-antelope-centos9/openstack-octavia-housekeeping@sha256:4adac3758179c1a40ec51a49e3332d3b00a89097c9215448daed2479d4aa8ae1
+      name: octavia_housekeeping_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-rsyslog@sha256:62d2bfe8dd415ee88d573f013a958465fc30851631459a1748305aaf509532ef
+      name: octavia-rsyslog-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-octavia-health-manager@sha256:c9bdc9f401ea709624bf41d5cb128b6adf1e3de4a388f1b47b20200dd65d366b
+      name: octavia-healthmanager-image-url-default
+    - image: quay.io/openstack-k8s-operators/octavia-operator@sha256:852ad251fd02b5ffd89018239d0435d4e0ac8f7f372245d74f32ac5931bf6958
+      name: manager
+    - image: quay.io/podified-antelope-centos9/openstack-octavia-health-manager@sha256:c9bdc9f401ea709624bf41d5cb128b6adf1e3de4a388f1b47b20200dd65d366b
+      name: octavia_healthmanager_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-octavia-housekeeping@sha256:4adac3758179c1a40ec51a49e3332d3b00a89097c9215448daed2479d4aa8ae1
+      name: octavia-housekeeping-image-url-default
+    - image: registry.redhat.io/ubi9/httpd-24@sha256:8439671ecde9adff63df7e4ea8fc10c7cb95195e466cdbe021bac93e82fd245e
+      name: octavia_apache_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-octavia-api@sha256:e78190f26f30b18a09949d32c584729d8a69a7a3e91657e3126ff2c310990ca2
+      name: octavia_api_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-octavia-worker@sha256:6f31471b0109b605e4927fc174ca5f45489a23d0858a812ab71f0c7a2065da1d
+      name: octavia-worker-image-url-default
+    - image: registry.redhat.io/ubi9/httpd-24@sha256:8439671ecde9adff63df7e4ea8fc10c7cb95195e466cdbe021bac93e82fd245e
+      name: octavia-apache-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-octavia-worker@sha256:6f31471b0109b605e4927fc174ca5f45489a23d0858a812ab71f0c7a2065da1d
+      name: octavia_worker_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-rsyslog@sha256:62d2bfe8dd415ee88d573f013a958465fc30851631459a1748305aaf509532ef
+      name: octavia_rsyslog_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-octavia-api@sha256:e78190f26f30b18a09949d32c584729d8a69a7a3e91657e3126ff2c310990ca2
+      name: octavia-api-image-url-default
+  version: 0.0.1
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: octavia-operator-controller-manager
+      failurePolicy: Fail
+      generateName: moctavia.kb.io
+      rules:
+        - apiGroups:
+            - octavia.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - octavias
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-octavia-openstack-org-v1beta1-octavia
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: octavia-operator-controller-manager
+      failurePolicy: Fail
+      generateName: voctavia.kb.io
+      rules:
+        - apiGroups:
+            - octavia.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - octavias
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-octavia-openstack-org-v1beta1-octavia

@@ -1,0 +1,676 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "heat.openstack.org/v1beta1",
+          "kind": "Heat",
+          "metadata": {
+            "name": "heat"
+          },
+          "spec": {
+            "customServiceConfig": "[DEFAULT]\ndebug = True\n",
+            "databaseInstance": "openstack",
+            "heatAPI": {},
+            "heatCfnAPI": {},
+            "heatEngine": {},
+            "rabbitMqClusterName": "rabbitmq",
+            "secret": "osp-secret"
+          }
+        },
+        {
+          "apiVersion": "heat.openstack.org/v1beta1",
+          "kind": "HeatAPI",
+          "metadata": {
+            "name": "heat-api"
+          },
+          "spec": {
+            "databaseAccount": "heat",
+            "databaseHostname": "openstack",
+            "passwordSelectors": {
+              "authEncryptionKey": "HeatAuthEncryptionKey",
+              "service": "HeatPassword"
+            },
+            "replicas": 1,
+            "resources": {},
+            "secret": "osp-secret",
+            "serviceAccount": "heat-heat",
+            "serviceUser": "heat",
+            "transportURLSecret": "rabbitmq-transport-url-heat-heat-transport"
+          }
+        },
+        {
+          "apiVersion": "heat.openstack.org/v1beta1",
+          "kind": "HeatCfnAPI",
+          "metadata": {
+            "name": "heat-cfnapi"
+          },
+          "spec": {
+            "databaseAccount": "heat",
+            "databaseHostname": "openstack",
+            "passwordSelectors": {
+              "authEncryptionKey": "HeatAuthEncryptionKey",
+              "service": "HeatPassword"
+            },
+            "replicas": 1,
+            "resources": {},
+            "secret": "osp-secret",
+            "serviceAccount": "heat-heat",
+            "serviceUser": "heat",
+            "transportURLSecret": "rabbitmq-transport-url-heat-heat-transport"
+          }
+        },
+        {
+          "apiVersion": "heat.openstack.org/v1beta1",
+          "kind": "HeatEngine",
+          "metadata": {
+            "name": "heat-engine"
+          },
+          "spec": {
+            "databaseAccount": "heat",
+            "databaseHostname": "openstack",
+            "passwordSelectors": {
+              "authEncryptionKey": "HeatAuthEncryptionKey",
+              "service": "HeatPassword"
+            },
+            "replicas": 1,
+            "resources": {},
+            "secret": "osp-secret",
+            "serviceAccount": "heat-heat",
+            "serviceUser": "heat",
+            "transportURLSecret": "rabbitmq-transport-url-heat-heat-transport"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-06-05T08:18:29Z"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/operator-type: non-standalone
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: heat-operator.v0.0.1
+  namespace: openstack
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: HeatAPI is the Schema for the heatapis API
+        displayName: Heat API
+        kind: HeatAPI
+        name: heatapis.heat.openstack.org
+        version: v1beta1
+      - description: HeatCfnAPI is the Schema for the heatcfnapis API
+        displayName: Heat Cfn API
+        kind: HeatCfnAPI
+        name: heatcfnapis.heat.openstack.org
+        version: v1beta1
+      - description: HeatEngine is the Schema for the heatengines API
+        displayName: Heat Engine
+        kind: HeatEngine
+        name: heatengines.heat.openstack.org
+        version: v1beta1
+      - description: Heat is the Schema for the heats API
+        displayName: Heat
+        kind: Heat
+        name: heats.heat.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: heatAPI.tls
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: heatCfnAPI.tls
+        version: v1beta1
+  description: Heat Operator
+  displayName: Heat Operator
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heatapis
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heatapis/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heatapis/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heatcfnapis
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heatcfnapis/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heatcfnapis/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heatengines
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heatengines/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heatengines/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heats
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heats/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heats/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneapis
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneendpoints
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneservices
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbdatabases
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - memcached.openstack.org
+              resources:
+                - memcacheds
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - transporturls
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - rolebindings
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - roles
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - topology.openstack.org
+              resources:
+                - topologies
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: heat-operator-controller-manager
+      deployments:
+        - label:
+            control-plane: controller-manager
+            openstack.org/operator-name: heat
+          name: heat-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                openstack.org/operator-name: heat
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+                  openstack.org/operator-name: heat
+              spec:
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                    image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    env:
+                      - name: RELATED_IMAGE_HEAT_API_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-heat-api@sha256:a9942f4a913a88bdd06d5baa29373219e9f47595f00e1683a731dfd6fccd3e37
+                      - name: RELATED_IMAGE_HEAT_CFNAPI_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-heat-api-cfn@sha256:ca52f7de97365409f9d9669345af315999c52947619e5a04ccece4cf42f6a4dc
+                      - name: RELATED_IMAGE_HEAT_ENGINE_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-heat-engine@sha256:8b94017c14e766968377bc76490f149b947417666e05100a45b38c06740b68ae
+                    image: quay.io/openstack-k8s-operators/heat-operator@sha256:39b8745c08b17b80eb7b9418f4031e5231da803282dd4b63dfe13e26185c65da
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: cert
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: heat-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: cert
+                    secret:
+                      defaultMode: 420
+                      secretName: webhook-server-cert
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: heat-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - OpenStack
+    - Orchestration
+    - Heat
+  links:
+    - name: Heat Operator
+      url: https://github.com/openstack-k8s-operators/heat-operator
+  maturity: beta
+  provider:
+    name: Red Hat Inc.
+    url: https://redhat.com/
+  relatedImages:
+    - image: quay.io/openstack-k8s-operators/heat-operator@sha256:39b8745c08b17b80eb7b9418f4031e5231da803282dd4b63dfe13e26185c65da
+      name: manager
+    - image: quay.io/podified-antelope-centos9/openstack-heat-api@sha256:a9942f4a913a88bdd06d5baa29373219e9f47595f00e1683a731dfd6fccd3e37
+      name: heat_api_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-heat-api-cfn@sha256:ca52f7de97365409f9d9669345af315999c52947619e5a04ccece4cf42f6a4dc
+      name: heat_cfnapi_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-heat-engine@sha256:8b94017c14e766968377bc76490f149b947417666e05100a45b38c06740b68ae
+      name: heat_engine_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-heat-api@sha256:a9942f4a913a88bdd06d5baa29373219e9f47595f00e1683a731dfd6fccd3e37
+      name: heat-api-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-heat-api-cfn@sha256:ca52f7de97365409f9d9669345af315999c52947619e5a04ccece4cf42f6a4dc
+      name: heat-cfnapi-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-heat-engine@sha256:8b94017c14e766968377bc76490f149b947417666e05100a45b38c06740b68ae
+      name: heat-engine-image-url-default
+    - image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+      name: kube-rbac-proxy
+  version: 0.0.1
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: heat-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mheat.kb.io
+      rules:
+        - apiGroups:
+            - heat.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - heats
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-heat-openstack-org-v1beta1-heat
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: heat-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vheat.kb.io
+      rules:
+        - apiGroups:
+            - heat.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - heats
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-heat-openstack-org-v1beta1-heat

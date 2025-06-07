@@ -1,0 +1,582 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "baremetal.openstack.org/v1beta1",
+          "kind": "OpenStackBaremetalSet",
+          "metadata": {
+            "name": "openstackbaremetalset"
+          },
+          "spec": {
+            "baremetalHosts": {
+              "compute-0": "172.22.0.100/24",
+              "compute-1": "172.22.0.101/24"
+            },
+            "ctlplaneGateway": "172.22.0.3",
+            "ctlplaneInterface": "enp1s0",
+            "deploymentSSHSecret": "baremetalset-deploy-secret",
+            "domainName": "osptest.openstack.org",
+            "osImage": "edpm-hardened-uefi.qcow2",
+            "passwordSecret": "baremetalset-password-secret"
+          }
+        },
+        {
+          "apiVersion": "baremetal.openstack.org/v1beta1",
+          "kind": "OpenStackProvisionServer",
+          "metadata": {
+            "name": "openstackprovisionserver"
+          },
+          "spec": {
+            "interface": "enp1s0",
+            "osImage": "edpm-hardened-uefi.qcow2",
+            "port": 8080
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-06-05T09:04:05Z"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/operator-type: non-standalone
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: openstack-baremetal-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: OpenStackBaremetalSet is the Schema for the openstackbaremetalsets API
+        displayName: OpenStack BaremetalSet
+        kind: OpenStackBaremetalSet
+        name: openstackbaremetalsets.baremetal.openstack.org
+        version: v1beta1
+      - description: OpenStackProvisionServer used to serve custom images for baremetal provisioning with Metal3
+        displayName: OpenStackProvisionServer
+        kind: OpenStackProvisionServer
+        name: openstackprovisionservers.baremetal.openstack.org
+        version: v1beta1
+  description: An operator for handling baremetal provisioning concerns for OpenStack
+  displayName: OpenStack Baremetal Operator
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - baremetal.openstack.org
+              resources:
+                - openstackbaremetalsets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - baremetal.openstack.org
+              resources:
+                - openstackbaremetalsets/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - baremetal.openstack.org
+              resources:
+                - openstackbaremetalsets/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - baremetal.openstack.org
+              resources:
+                - openstackprovisionservers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - baremetal.openstack.org
+              resources:
+                - openstackprovisionservers/finalizers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - baremetal.openstack.org
+              resources:
+                - openstackprovisionservers/status
+              verbs:
+                - get
+                - list
+                - patch
+                - update
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps/finalizers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - nodes
+              verbs:
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets/finalizers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - volumes
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - metal3.io
+              resources:
+                - baremetalhosts
+              verbs:
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - metal3.io
+              resources:
+                - baremetalhosts/status
+              verbs:
+                - get
+            - apiGroups:
+                - metal3.io
+              resources:
+                - provisionings
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - rolebindings
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - roles
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - hostnetwork
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: openstack-baremetal-operator-controller-manager
+      deployments:
+        - label:
+            app.kubernetes.io/component: manager
+            app.kubernetes.io/created-by: openstack-baremetal-operator
+            app.kubernetes.io/instance: controller-manager
+            app.kubernetes.io/managed-by: kustomize
+            app.kubernetes.io/name: deployment
+            app.kubernetes.io/part-of: openstack-baremetal-operator
+            control-plane: controller-manager
+            openstack.org/operator-name: baremetal
+          name: openstack-baremetal-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                openstack.org/operator-name: baremetal
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+                  openstack.org/operator-name: baremetal
+              spec:
+                affinity:
+                  nodeAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                      nodeSelectorTerms:
+                        - matchExpressions:
+                            - key: kubernetes.io/arch
+                              operator: In
+                              values:
+                                - amd64
+                                - arm64
+                                - ppc64le
+                                - s390x
+                            - key: kubernetes.io/os
+                              operator: In
+                              values:
+                                - linux
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                    image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                    command:
+                      - /manager
+                    env:
+                      - name: RELATED_IMAGE_OS_CONTAINER_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/edpm-hardened-uefi@sha256:63178081fddb98540a922d3e3deb20572d2f77ab82b78c7457165f260f9b07be
+                      - name: RELATED_IMAGE_AGENT_IMAGE_URL_DEFAULT
+                        value: quay.io/openstack-k8s-operators/openstack-baremetal-operator-agent@sha256:7d653ef5d62e75c27411563ed231928153aac7cadb070ba725f15e5ce981b819
+                      - name: RELATED_IMAGE_APACHE_IMAGE_URL_DEFAULT
+                        value: registry.redhat.io/ubi9/httpd-24@sha256:8439671ecde9adff63df7e4ea8fc10c7cb95195e466cdbe021bac93e82fd245e
+                      - name: OS_IMAGE_DEFAULT
+                        value: edpm-hardened-uefi.qcow2
+                    image: quay.io/openstack-k8s-operators/openstack-baremetal-operator@sha256:3f2c7ab5d9e6cf3ff9cd3055751cb1189c5421bdca65f4652a804be08d99e717
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                      capabilities:
+                        drop:
+                          - ALL
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: cert
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: openstack-baremetal-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: cert
+                    secret:
+                      defaultMode: 420
+                      secretName: webhook-server-cert
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: openstack-baremetal-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - cn-openstack
+    - openstack
+  links:
+    - name: Openstack Baremetal Operator
+      url: https://github.com/openstack-k8s-operators/openstack-baremetal-operator
+  maturity: beta
+  provider:
+    name: Red Hat
+    url: https://redhat.com/
+  relatedImages:
+    - image: registry.redhat.io/ubi9/httpd-24@sha256:8439671ecde9adff63df7e4ea8fc10c7cb95195e466cdbe021bac93e82fd245e
+      name: apache_image_url_default
+    - image: quay.io/podified-antelope-centos9/edpm-hardened-uefi@sha256:63178081fddb98540a922d3e3deb20572d2f77ab82b78c7457165f260f9b07be
+      name: os-container-image-url-default
+    - image: quay.io/openstack-k8s-operators/openstack-baremetal-operator-agent@sha256:7d653ef5d62e75c27411563ed231928153aac7cadb070ba725f15e5ce981b819
+      name: agent-image-url-default
+    - image: registry.redhat.io/ubi9/httpd-24@sha256:8439671ecde9adff63df7e4ea8fc10c7cb95195e466cdbe021bac93e82fd245e
+      name: apache-image-url-default
+    - image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+      name: kube-rbac-proxy
+    - image: quay.io/openstack-k8s-operators/openstack-baremetal-operator@sha256:3f2c7ab5d9e6cf3ff9cd3055751cb1189c5421bdca65f4652a804be08d99e717
+      name: manager
+    - image: quay.io/podified-antelope-centos9/edpm-hardened-uefi@sha256:63178081fddb98540a922d3e3deb20572d2f77ab82b78c7457165f260f9b07be
+      name: os_container_image_url_default
+    - image: quay.io/openstack-k8s-operators/openstack-baremetal-operator-agent@sha256:7d653ef5d62e75c27411563ed231928153aac7cadb070ba725f15e5ce981b819
+      name: agent_image_url_default
+  version: 0.0.1
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: openstack-baremetal-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mopenstackprovisionserver.kb.io
+      rules:
+        - apiGroups:
+            - baremetal.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - openstackprovisionservers
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-baremetal-openstack-org-v1beta1-openstackprovisionserver
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: openstack-baremetal-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vopenstackbaremetalset.kb.io
+      rules:
+        - apiGroups:
+            - baremetal.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+            - DELETE
+          resources:
+            - openstackbaremetalsets
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-baremetal-openstack-org-v1beta1-openstackbaremetalset
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: openstack-baremetal-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vopenstackprovisionserver.kb.io
+      rules:
+        - apiGroups:
+            - baremetal.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - openstackprovisionservers
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-baremetal-openstack-org-v1beta1-openstackprovisionserver

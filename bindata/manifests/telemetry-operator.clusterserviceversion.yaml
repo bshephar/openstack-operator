@@ -1,0 +1,1089 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "telemetry.openstack.org/v1beta1",
+          "kind": "Autoscaling",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "telemetry-operator",
+              "app.kubernetes.io/instance": "autoscaling-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "autoscaling",
+              "app.kubernetes.io/part-of": "telemetry-operator"
+            },
+            "name": "autoscaling"
+          },
+          "spec": {
+            "aodh": {
+              "databaseAccount": "aodh",
+              "databaseInstance": "openstack",
+              "memcachedInstance": "memcached",
+              "passwordSelectors": null,
+              "secret": "osp-secret"
+            }
+          }
+        },
+        {
+          "apiVersion": "telemetry.openstack.org/v1beta1",
+          "kind": "Ceilometer",
+          "metadata": {
+            "name": "ceilometer",
+            "namespace": "openstack"
+          },
+          "spec": {
+            "secret": "osp-secret"
+          }
+        },
+        {
+          "apiVersion": "telemetry.openstack.org/v1beta1",
+          "kind": "Logging",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "telemetry-operator",
+              "app.kubernetes.io/instance": "logging-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "logging",
+              "app.kubernetes.io/part-of": "telemetry-operator"
+            },
+            "name": "logging"
+          },
+          "spec": {
+            "cloNamespace": "openshift-logging",
+            "port": 10514
+          }
+        },
+        {
+          "apiVersion": "telemetry.openstack.org/v1beta1",
+          "kind": "MetricStorage",
+          "metadata": {
+            "labels": {
+              "app.kubernetes.io/created-by": "telemetry-operator",
+              "app.kubernetes.io/instance": "metricstorage-sample",
+              "app.kubernetes.io/managed-by": "kustomize",
+              "app.kubernetes.io/name": "metricstorage",
+              "app.kubernetes.io/part-of": "telemetry-operator"
+            },
+            "name": "metricstorage-sample"
+          },
+          "spec": {
+            "monitoringStack": {
+              "alertingEnabled": true,
+              "scrapeInterval": "30s",
+              "storage": {
+                "persistent": {
+                  "pvcStorageRequest": "20G"
+                },
+                "retention": "24h",
+                "strategy": "persistent"
+              }
+            }
+          }
+        },
+        {
+          "apiVersion": "telemetry.openstack.org/v1beta1",
+          "kind": "Telemetry",
+          "metadata": {
+            "name": "telemetry"
+          },
+          "spec": {
+            "autoscaling": {
+              "aodh": {
+                "databaseAccount": "aodh",
+                "databaseInstance": "openstack",
+                "memcachedInstance": "memcached",
+                "passwordSelectors": null,
+                "secret": "osp-secret"
+              },
+              "enabled": false,
+              "heatInstance": "heat"
+            },
+            "ceilometer": {
+              "enabled": true,
+              "secret": "osp-secret"
+            },
+            "logging": {
+              "enabled": false,
+              "port": 10514
+            },
+            "metricStorage": {
+              "enabled": false,
+              "monitoringStack": {
+                "alertingEnabled": true,
+                "scrapeInterval": "30s",
+                "storage": {
+                  "persistent": {
+                    "pvcStorageRequest": "20G"
+                  },
+                  "retention": "24h",
+                  "strategy": "persistent"
+                }
+              }
+            }
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-06-05T08:37:48Z"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/suggested-namespace: openstack
+    operators.openshift.io/infrastructure-features: '["disconnected"]'
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/operator-type: non-standalone
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: telemetry-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: Autoscaling is the Schema for the autoscalings API
+        displayName: Autoscaling
+        kind: Autoscaling
+        name: autoscalings.telemetry.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: aodh.tls
+        version: v1beta1
+      - description: Ceilometer is the Schema for the ceilometers API
+        displayName: Ceilometer
+        kind: Ceilometer
+        name: ceilometers.telemetry.openstack.org
+        specDescriptors:
+          - description: KSMTLS - Parameters related to the TLS for kube-state-metrics
+            displayName: KSMTLS
+            path: ksmTls
+          - description: MysqldExporterTLS - Parameters related to the TLS for mysqld_exporter
+            displayName: Mysqld Exporter TLS
+            path: mysqldExporterTLS
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: Logging is the Schema for the loggings API
+        displayName: Logging
+        kind: Logging
+        name: loggings.telemetry.openstack.org
+        version: v1beta1
+      - description: MetricStorage is the Schema for the metricstorages API
+        displayName: Metric Storage
+        kind: MetricStorage
+        name: metricstorages.telemetry.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: Prometheus TLS
+            path: prometheusTls
+        version: v1beta1
+      - description: Telemetry is the Schema for the telemetry API
+        displayName: Telemetry
+        kind: Telemetry
+        name: telemetries.telemetry.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: autoscaling.aodh.tls
+          - description: Enabled - Whether OpenStack autoscaling service should be deployed and managed
+            displayName: Enabled
+            path: autoscaling.enabled
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+          - description: Enabled - Whether OpenStack Ceilometer service should be deployed and managed
+            displayName: Enabled
+            path: ceilometer.enabled
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+          - description: KSMTLS - Parameters related to the TLS for kube-state-metrics
+            displayName: KSMTLS
+            path: ceilometer.ksmTls
+          - description: MysqldExporterTLS - Parameters related to the TLS for mysqld_exporter
+            displayName: Mysqld Exporter TLS
+            path: ceilometer.mysqldExporterTLS
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: ceilometer.tls
+          - description: Enabled - Whether OpenStack logging service should be deployed and managed
+            displayName: Enabled
+            path: logging.enabled
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+          - description: Enabled - Whether a MetricStorage should be deployed and managed
+            displayName: Enabled
+            path: metricStorage.enabled
+            x-descriptors:
+              - urn:alm:descriptor:com.tectonic.ui:booleanSwitch
+          - description: TLS - Parameters related to the TLS
+            displayName: Prometheus TLS
+            path: metricStorage.prometheusTls
+        version: v1beta1
+  description: Telemetry Operator
+  displayName: Telemetry Operator
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apiextensions.k8s.io
+              resources:
+                - customresourcedefinitions
+              verbs:
+                - get
+                - list
+            - apiGroups:
+                - apps
+              resources:
+                - statefulsets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - heat.openstack.org
+              resources:
+                - heats
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - k8s.cni.cncf.io
+              resources:
+                - network-attachment-definitions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneapis
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneendpoints
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneservices
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - galeras
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbdatabases
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbdatabases/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - memcached.openstack.org
+              resources:
+                - memcacheds
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - monitoring.rhobs
+              resources:
+                - alertmanagers
+              verbs:
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - monitoring.rhobs
+              resources:
+                - monitoringstacks
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - monitoring.rhobs
+              resources:
+                - prometheuses
+              verbs:
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - monitoring.rhobs
+              resources:
+                - prometheusrules
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - monitoring.rhobs
+              resources:
+                - scrapeconfigs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - monitoring.rhobs
+              resources:
+                - servicemonitors
+              verbs:
+                - delete
+                - get
+                - list
+            - apiGroups:
+                - network.openstack.org
+              resources:
+                - ipsets
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - observability.openshift.io
+              resources:
+                - uiplugins
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - watch
+            - apiGroups:
+                - rabbitmq.com
+              resources:
+                - rabbitmqclusters
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - transporturls
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - rolebindings
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - roles
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - autoscalings
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - autoscalings/finalizers
+              verbs:
+                - delete
+                - patch
+                - update
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - autoscalings/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - ceilometers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - ceilometers/finalizers
+              verbs:
+                - delete
+                - patch
+                - update
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - ceilometers/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - loggings
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - loggings/finalizers
+              verbs:
+                - delete
+                - patch
+                - update
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - loggings/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - metricstorages
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - metricstorages/finalizers
+              verbs:
+                - delete
+                - patch
+                - update
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - metricstorages/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - telemetries
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - telemetries/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - telemetry.openstack.org
+              resources:
+                - telemetries/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - topology.openstack.org
+              resources:
+                - topologies
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: telemetry-operator-controller-manager
+      deployments:
+        - label:
+            control-plane: controller-manager
+            openstack.org/operator-name: telemetry
+          name: telemetry-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                openstack.org/operator-name: telemetry
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+                  openstack.org/operator-name: telemetry
+              spec:
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                    image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    env:
+                      - name: RELATED_IMAGE_CEILOMETER_CENTRAL_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-ceilometer-central@sha256:c491e4cfcb9346c3a93eb7cd5db89da3a2ac3106294c2c6f5fd4b23c8409274a
+                      - name: RELATED_IMAGE_CEILOMETER_COMPUTE_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-ceilometer-compute@sha256:bf4304f678f614b35e7969673730ef6a3043ff41a89483aadd5adfb3193749d4
+                      - name: RELATED_IMAGE_CEILOMETER_NOTIFICATION_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-ceilometer-notification@sha256:e07d8a2aa2ebe1a25a4680944a372d58e3dd0c99593e0eb1f3bcf5e88f5a602b
+                      - name: RELATED_IMAGE_CEILOMETER_IPMI_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-ceilometer-ipmi@sha256:85fcc16d90c546e9db6a5bda66903c8a56fc83b2d9dc3a18f866e7c660a07b3a
+                      - name: RELATED_IMAGE_CEILOMETER_SGCORE_IMAGE_URL_DEFAULT
+                        value: quay.io/openstack-k8s-operators/sg-core@sha256:d31841d2f8da3d82354cfb48c6a27db8e16cbf355d9a1995ea041c00ebd424ef
+                      - name: RELATED_IMAGE_APACHE_IMAGE_URL_DEFAULT
+                        value: registry.redhat.io/ubi9/httpd-24@sha256:8439671ecde9adff63df7e4ea8fc10c7cb95195e466cdbe021bac93e82fd245e
+                      - name: RELATED_IMAGE_AODH_API_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-aodh-api@sha256:70fe30a5d052a025851cd34cbc8d8095d4376e117b4addc33ba62d43198def7b
+                      - name: RELATED_IMAGE_AODH_EVALUATOR_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-aodh-evaluator@sha256:97e5478bf744ffc7a1f380c8b4d0c8c13b6f9df86c9cc6b45b37272743e21f8a
+                      - name: RELATED_IMAGE_AODH_NOTIFIER_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-aodh-notifier@sha256:273940cde398640143eb31d98fe930614ee0290bc4932527acce228fd9eaba42
+                      - name: RELATED_IMAGE_AODH_LISTENER_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-aodh-listener@sha256:0084ee9e13b72b1588e87b20c94c73b219fe02052093a493b4267b3a9f91474f
+                    image: quay.io/openstack-k8s-operators/telemetry-operator@sha256:47d1eacd07738b8dc59814467f756e12092d57c051b119be499f425ec738d607
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: cert
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: telemetry-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: cert
+                    secret:
+                      defaultMode: 420
+                      secretName: webhook-server-cert
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: telemetry-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - OpenStack
+    - Telemetry
+    - Ceilometer
+  links:
+    - name: Telemetry Operator
+      url: https://github.com/openstack-k8s-operators/telemetry-operator
+  maturity: beta
+  provider:
+    name: Red Hat Inc.
+    url: https://redhat.com/
+  relatedImages:
+    - image: quay.io/podified-antelope-centos9/openstack-ceilometer-notification@sha256:e07d8a2aa2ebe1a25a4680944a372d58e3dd0c99593e0eb1f3bcf5e88f5a602b
+      name: ceilometer-notification-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-ceilometer-ipmi@sha256:85fcc16d90c546e9db6a5bda66903c8a56fc83b2d9dc3a18f866e7c660a07b3a
+      name: ceilometer-ipmi-image-url-default
+    - image: quay.io/openstack-k8s-operators/telemetry-operator@sha256:47d1eacd07738b8dc59814467f756e12092d57c051b119be499f425ec738d607
+      name: manager
+    - image: quay.io/podified-antelope-centos9/openstack-ceilometer-compute@sha256:bf4304f678f614b35e7969673730ef6a3043ff41a89483aadd5adfb3193749d4
+      name: ceilometer_compute_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-aodh-listener@sha256:0084ee9e13b72b1588e87b20c94c73b219fe02052093a493b4267b3a9f91474f
+      name: aodh_listener_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-ceilometer-compute@sha256:bf4304f678f614b35e7969673730ef6a3043ff41a89483aadd5adfb3193749d4
+      name: ceilometer-compute-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-aodh-evaluator@sha256:97e5478bf744ffc7a1f380c8b4d0c8c13b6f9df86c9cc6b45b37272743e21f8a
+      name: aodh-evaluator-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-ceilometer-central@sha256:c491e4cfcb9346c3a93eb7cd5db89da3a2ac3106294c2c6f5fd4b23c8409274a
+      name: ceilometer_central_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-ceilometer-notification@sha256:e07d8a2aa2ebe1a25a4680944a372d58e3dd0c99593e0eb1f3bcf5e88f5a602b
+      name: ceilometer_notification_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-ceilometer-ipmi@sha256:85fcc16d90c546e9db6a5bda66903c8a56fc83b2d9dc3a18f866e7c660a07b3a
+      name: ceilometer_ipmi_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-aodh-api@sha256:70fe30a5d052a025851cd34cbc8d8095d4376e117b4addc33ba62d43198def7b
+      name: aodh_api_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-aodh-evaluator@sha256:97e5478bf744ffc7a1f380c8b4d0c8c13b6f9df86c9cc6b45b37272743e21f8a
+      name: aodh_evaluator_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-ceilometer-central@sha256:c491e4cfcb9346c3a93eb7cd5db89da3a2ac3106294c2c6f5fd4b23c8409274a
+      name: ceilometer-central-image-url-default
+    - image: quay.io/openstack-k8s-operators/sg-core@sha256:d31841d2f8da3d82354cfb48c6a27db8e16cbf355d9a1995ea041c00ebd424ef
+      name: ceilometer-sgcore-image-url-default
+    - image: registry.redhat.io/ubi9/httpd-24@sha256:8439671ecde9adff63df7e4ea8fc10c7cb95195e466cdbe021bac93e82fd245e
+      name: apache-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-aodh-api@sha256:70fe30a5d052a025851cd34cbc8d8095d4376e117b4addc33ba62d43198def7b
+      name: aodh-api-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-aodh-notifier@sha256:273940cde398640143eb31d98fe930614ee0290bc4932527acce228fd9eaba42
+      name: aodh-notifier-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-aodh-listener@sha256:0084ee9e13b72b1588e87b20c94c73b219fe02052093a493b4267b3a9f91474f
+      name: aodh-listener-image-url-default
+    - image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+      name: kube-rbac-proxy
+    - image: quay.io/openstack-k8s-operators/sg-core@sha256:d31841d2f8da3d82354cfb48c6a27db8e16cbf355d9a1995ea041c00ebd424ef
+      name: ceilometer_sgcore_image_url_default
+    - image: registry.redhat.io/ubi9/httpd-24@sha256:8439671ecde9adff63df7e4ea8fc10c7cb95195e466cdbe021bac93e82fd245e
+      name: apache_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-aodh-notifier@sha256:273940cde398640143eb31d98fe930614ee0290bc4932527acce228fd9eaba42
+      name: aodh_notifier_image_url_default
+  version: 0.0.1
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: telemetry-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mautoscaling.kb.io
+      rules:
+        - apiGroups:
+            - telemetry.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - autoscalings
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-telemetry-openstack-org-v1beta1-autoscaling
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: telemetry-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mceilometer.kb.io
+      rules:
+        - apiGroups:
+            - telemetry.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - ceilometers
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-telemetry-openstack-org-v1beta1-ceilometer
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: telemetry-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mmetricstorage.kb.io
+      rules:
+        - apiGroups:
+            - telemetry.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - metricstorages
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-telemetry-openstack-org-v1beta1-metricstorage
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: telemetry-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mtelemetry.kb.io
+      rules:
+        - apiGroups:
+            - telemetry.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - telemetries
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-telemetry-openstack-org-v1beta1-telemetry
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: telemetry-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vautoscaling.kb.io
+      rules:
+        - apiGroups:
+            - telemetry.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - autoscalings
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-telemetry-openstack-org-v1beta1-autoscaling
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: telemetry-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vceilometer.kb.io
+      rules:
+        - apiGroups:
+            - telemetry.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - ceilometers
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-telemetry-openstack-org-v1beta1-ceilometer
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: telemetry-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vmetricstorage.kb.io
+      rules:
+        - apiGroups:
+            - telemetry.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - metricstorages
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-telemetry-openstack-org-v1beta1-metricstorage
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: telemetry-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vtelemetry.kb.io
+      rules:
+        - apiGroups:
+            - telemetry.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - telemetries
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-telemetry-openstack-org-v1beta1-telemetry

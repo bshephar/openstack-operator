@@ -1,0 +1,894 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "designate.openstack.org/v1beta1",
+          "kind": "Designate",
+          "metadata": {
+            "name": "designate"
+          },
+          "spec": {
+            "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+            "databaseAccount": "designate",
+            "databaseInstance": "openstack",
+            "designateAPI": {
+              "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+              "databaseAccount": "designate",
+              "rabbitMqClusterName": "rabbitmq",
+              "secret": "osp-secret",
+              "serviceUser": "designate"
+            },
+            "designateBackendbind9": {
+              "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+              "databaseAccount": "designate",
+              "networkAttachments": [
+                "designate"
+              ],
+              "rabbitMqClusterName": "rabbitmq",
+              "replicas": 1,
+              "secret": "osp-secret",
+              "serviceUser": "designate",
+              "storageClass": "local-storage",
+              "storageRequest": "10G"
+            },
+            "designateCentral": {
+              "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+              "databaseAccount": "designate",
+              "rabbitMqClusterName": "rabbitmq",
+              "secret": "osp-secret",
+              "serviceUser": "designate"
+            },
+            "designateMdns": {
+              "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+              "databaseAccount": "designate",
+              "networkAttachments": [
+                "designate"
+              ],
+              "rabbitMqClusterName": "rabbitmq",
+              "secret": "osp-secret",
+              "serviceUser": "designate"
+            },
+            "designateProducer": {
+              "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+              "databaseAccount": "designate",
+              "rabbitMqClusterName": "rabbitmq",
+              "secret": "osp-secret",
+              "serviceUser": "designate"
+            },
+            "designateUnbound": {
+              "replicas": 1
+            },
+            "designateWorker": {
+              "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+              "databaseAccount": "designate",
+              "networkAttachments": [
+                "designate"
+              ],
+              "rabbitMqClusterName": "rabbitmq",
+              "secret": "osp-secret",
+              "serviceUser": "designate"
+            },
+            "rabbitMqClusterName": "rabbitmq",
+            "secret": "osp-secret",
+            "serviceUser": "designate"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-06-05T08:18:06Z"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/suggested-namespace: openstack
+    operators.openshift.io/infrastructure-features: '["disconnected"]'
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/operator-type: non-standalone
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: designate-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: DesignateAPI is the Schema for the designateapis API
+        displayName: Designate API
+        kind: DesignateAPI
+        name: designateapis.designate.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - kind: DesignateBackendbind9
+        name: designatebackendbind9s.designate.openstack.org
+        version: v1beta1
+      - description: DesignateCentral is the Schema for the designatecentral API
+        displayName: Designate Central
+        kind: DesignateCentral
+        name: designatecentrals.designate.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: DesignateMdns is the Schema for the designatemdnses API
+        displayName: Designate Mdns
+        kind: DesignateMdns
+        name: designatemdnses.designate.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: DesignateProducer is the Schema for the designateproducer API
+        displayName: Designate Producer
+        kind: DesignateProducer
+        name: designateproducers.designate.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: Designate is the Schema for the designates API
+        displayName: Designate
+        kind: Designate
+        name: designates.designate.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: designateAPI.tls
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: designateCentral.tls
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: designateMdns.tls
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: designateProducer.tls
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: designateWorker.tls
+        version: v1beta1
+      - description: DesignateUnbound is the Schema for the designateunbound API
+        displayName: Designate Unbound
+        kind: DesignateUnbound
+        name: designateunbounds.designate.openstack.org
+        version: v1beta1
+      - description: DesignateWorker is the Schema for the designateworker API
+        displayName: Designate Worker
+        kind: DesignateWorker
+        name: designateworkers.designate.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+  description: Designate Operator
+  displayName: Designate Operator
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - statefulsets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - get
+                - list
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateapis
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateapis/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateapis/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designatebackendbind9s
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designatebackendbind9s/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designatebackendbind9s/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designatecentrals
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designatecentrals/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designatecentrals/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designatemdnses
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designatemdnses/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designatemdnses/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateproducers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateproducers/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateproducers/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designates
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designates/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designates/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateunbounds
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateunbounds/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateunbounds/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateworkers
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateworkers/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - designate.openstack.org
+              resources:
+                - designateworkers/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - k8s.cni.cncf.io
+              resources:
+                - network-attachment-definitions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneapis
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneendpoints
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneservices
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbdatabases
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - transporturls
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - rolebindings
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - roles
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - redis.openstack.org
+              resources:
+                - redises
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - route.openshift.io
+              resources:
+                - routes
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+                - privileged
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - topology.openstack.org
+              resources:
+                - topologies
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: designate-operator-controller-manager
+      deployments:
+        - label:
+            control-plane: controller-manager
+            openstack.org/operator-name: designate
+          name: designate-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                openstack.org/operator-name: designate
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+                  openstack.org/operator-name: designate
+              spec:
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                    image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    env:
+                      - name: RELATED_IMAGE_DESIGNATE_API_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-designate-api@sha256:f831dfd78a137c689e08954ff3c7022c266a436e944e7b06f9c39e1c9cdca688
+                      - name: RELATED_IMAGE_DESIGNATE_CENTRAL_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-designate-central@sha256:f7400fc1698d0a337cbb235d559341fca08cb5f7f8e839bb3f6d36559e5b8962
+                      - name: RELATED_IMAGE_DESIGNATE_MDNS_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-designate-mdns@sha256:7b9b22b09b00b2f2a27eda8d47d840cdbca83b4f6399acbc8760ef917d8e5166
+                      - name: RELATED_IMAGE_DESIGNATE_PRODUCER_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-designate-producer@sha256:23f1c683f7f8c08f89ef8bc39f4d28ccc578d3ab325b27e0d1d6b540c5c97448
+                      - name: RELATED_IMAGE_DESIGNATE_WORKER_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-designate-worker@sha256:cda9f6763ca91845664629ac64cb311e03dcdfa75d8204ee7239945759380645
+                      - name: RELATED_IMAGE_DESIGNATE_BACKENDBIND9_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-designate-backend-bind9@sha256:7e48c81a77d2a988d40b41ec2e3c13fbb802211bdc3c5ac35a60a0b24a2f8f14
+                      - name: RELATED_IMAGE_DESIGNATE_UNBOUND_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-unbound@sha256:ba7d1a999241c76d2e55cf69635080952786c83a9b0e0878e480bed57595fe54
+                      - name: RELATED_IMAGE_NET_UTILS_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-netutils@sha256:2ab1643e5da7b9302731e031568628018571cdf45a7319a0cfab9474683afad3
+                    image: quay.io/openstack-k8s-operators/designate-operator@sha256:fe55d3eff25aee0e0a215c41b84431ce206544d0d0071df708c94db32d06dbf5
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: cert
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: designate-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: cert
+                    secret:
+                      defaultMode: 420
+                      secretName: webhook-server-cert
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: designate-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - OpenStack
+    - Network
+    - Designate
+  links:
+    - name: Designate Operator
+      url: https://github.com/openstack-k8s-operators/designate-operator
+  maturity: alpha
+  provider:
+    name: Red Hat Inc.
+    url: https://redhat.com/
+  relatedImages:
+    - image: quay.io/podified-antelope-centos9/openstack-designate-api@sha256:f831dfd78a137c689e08954ff3c7022c266a436e944e7b06f9c39e1c9cdca688
+      name: designate-api-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-designate-producer@sha256:23f1c683f7f8c08f89ef8bc39f4d28ccc578d3ab325b27e0d1d6b540c5c97448
+      name: designate-producer-image-url-default
+    - image: quay.io/openstack-k8s-operators/designate-operator@sha256:fe55d3eff25aee0e0a215c41b84431ce206544d0d0071df708c94db32d06dbf5
+      name: manager
+    - image: quay.io/podified-antelope-centos9/openstack-designate-api@sha256:f831dfd78a137c689e08954ff3c7022c266a436e944e7b06f9c39e1c9cdca688
+      name: designate_api_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-netutils@sha256:2ab1643e5da7b9302731e031568628018571cdf45a7319a0cfab9474683afad3
+      name: net_utils_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-designate-mdns@sha256:7b9b22b09b00b2f2a27eda8d47d840cdbca83b4f6399acbc8760ef917d8e5166
+      name: designate-mdns-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-designate-backend-bind9@sha256:7e48c81a77d2a988d40b41ec2e3c13fbb802211bdc3c5ac35a60a0b24a2f8f14
+      name: designate_backendbind9_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-designate-central@sha256:f7400fc1698d0a337cbb235d559341fca08cb5f7f8e839bb3f6d36559e5b8962
+      name: designate-central-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-designate-worker@sha256:cda9f6763ca91845664629ac64cb311e03dcdfa75d8204ee7239945759380645
+      name: designate-worker-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-designate-backend-bind9@sha256:7e48c81a77d2a988d40b41ec2e3c13fbb802211bdc3c5ac35a60a0b24a2f8f14
+      name: designate-backendbind9-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-unbound@sha256:ba7d1a999241c76d2e55cf69635080952786c83a9b0e0878e480bed57595fe54
+      name: designate-unbound-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-designate-central@sha256:f7400fc1698d0a337cbb235d559341fca08cb5f7f8e839bb3f6d36559e5b8962
+      name: designate_central_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-designate-worker@sha256:cda9f6763ca91845664629ac64cb311e03dcdfa75d8204ee7239945759380645
+      name: designate_worker_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-unbound@sha256:ba7d1a999241c76d2e55cf69635080952786c83a9b0e0878e480bed57595fe54
+      name: designate_unbound_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-netutils@sha256:2ab1643e5da7b9302731e031568628018571cdf45a7319a0cfab9474683afad3
+      name: net-utils-image-url-default
+    - image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+      name: kube-rbac-proxy
+    - image: quay.io/podified-antelope-centos9/openstack-designate-mdns@sha256:7b9b22b09b00b2f2a27eda8d47d840cdbca83b4f6399acbc8760ef917d8e5166
+      name: designate_mdns_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-designate-producer@sha256:23f1c683f7f8c08f89ef8bc39f4d28ccc578d3ab325b27e0d1d6b540c5c97448
+      name: designate_producer_image_url_default
+  version: 0.0.1
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: designate-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mdesignate.kb.io
+      rules:
+        - apiGroups:
+            - designate.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - designates
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-designate-openstack-org-v1beta1-designate
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: designate-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vdesignate.kb.io
+      rules:
+        - apiGroups:
+            - designate.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - designates
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-designate-openstack-org-v1beta1-designate

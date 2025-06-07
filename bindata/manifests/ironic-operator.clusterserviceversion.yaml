@@ -1,0 +1,765 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "ironic.openstack.org/v1beta1",
+          "kind": "Ironic",
+          "metadata": {
+            "name": "ironic"
+          },
+          "spec": {
+            "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+            "databaseInstance": "openstack",
+            "ironicAPI": {},
+            "ironicConductors": [
+              {
+                "storageRequest": "10G"
+              }
+            ],
+            "ironicInspector": {},
+            "ironicNeutronAgent": {},
+            "secret": "osp-secret",
+            "serviceUser": "ironic",
+            "storageClass": "local-storage"
+          }
+        },
+        {
+          "apiVersion": "ironic.openstack.org/v1beta1",
+          "kind": "IronicAPI",
+          "metadata": {
+            "name": "ironicapi-sample"
+          },
+          "spec": {
+            "databaseHostname": "openstack.ironic-kuttl-tests.svc"
+          }
+        },
+        {
+          "apiVersion": "ironic.openstack.org/v1beta1",
+          "kind": "IronicConductor",
+          "metadata": {
+            "name": "ironicconductor-sample"
+          },
+          "spec": {
+            "databaseHostname": "openstack.ironic-kuttl-tests.svc",
+            "storageRequest": "10G"
+          }
+        },
+        {
+          "apiVersion": "ironic.openstack.org/v1beta1",
+          "kind": "IronicInspector",
+          "metadata": {
+            "name": "ironicinspector-sample"
+          },
+          "spec": {
+            "secret": "osp-secret"
+          }
+        },
+        {
+          "apiVersion": "ironic.openstack.org/v1beta1",
+          "kind": "IronicNeutronAgent",
+          "metadata": {
+            "name": "ironic-neutron-agent-sample",
+            "namespace": "openstack"
+          },
+          "spec": {
+            "secret": "osp-secret"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-06-04T18:55:02Z"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/suggested-namespace: openstack
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/operator-type: non-standalone
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: ironic-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: IronicAPI is the Schema for the ironicapis API
+        displayName: Ironic API
+        kind: IronicAPI
+        name: ironicapis.ironic.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: IronicConductor is the Schema for the ironicconductors Conductor
+        displayName: Ironic Conductor
+        kind: IronicConductor
+        name: ironicconductors.ironic.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: IronicInspector is the Schema for the ironicinspectors
+        displayName: Ironic Inspector
+        kind: IronicInspector
+        name: ironicinspectors.ironic.openstack.org
+        version: v1beta1
+      - description: IronicNeutronAgent is the Schema for the ML2 networking-baremetal's agent
+        displayName: Ironic Neutron Agent
+        kind: IronicNeutronAgent
+        name: ironicneutronagents.ironic.openstack.org
+        version: v1beta1
+      - description: Ironic is the Schema for the ironics API
+        displayName: Ironic
+        kind: Ironic
+        name: ironics.ironic.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: ironicAPI.tls
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: ironicInspector.tls
+        version: v1beta1
+  description: Ironic Operator
+  displayName: Ironic Operator
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - statefulsets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - persistentvolumeclaims
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - get
+                - list
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicapis
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicapis/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicapis/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicconductors
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicconductors/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicconductors/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicinspectors
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicinspectors/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicinspectors/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicneutronagents
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicneutronagents/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironicneutronagents/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironics
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironics/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - ironic.openstack.org
+              resources:
+                - ironics/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - k8s.cni.cncf.io
+              resources:
+                - network-attachment-definitions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneapis
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneendpoints
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneservices
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbdatabases
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - operator.openshift.io
+              resources:
+                - ingresscontrollers
+              verbs:
+                - get
+                - list
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - transporturls
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - rolebindings
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - roles
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - route.openshift.io
+              resources:
+                - routes
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+                - privileged
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - topology.openstack.org
+              resources:
+                - topologies
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: ironic-operator-controller-manager
+      deployments:
+        - label:
+            control-plane: controller-manager
+            openstack.org/operator-name: ironic
+          name: ironic-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                openstack.org/operator-name: ironic
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+                  openstack.org/operator-name: ironic
+              spec:
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                    image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    env:
+                      - name: RELATED_IMAGE_IRONIC_API_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-ironic-api@sha256:827d7ae57a9534f6e658b7b202256e43ac6e046c207ba3ae2ff8ead3ce942a93
+                      - name: RELATED_IMAGE_IRONIC_CONDUCTOR_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-ironic-conductor@sha256:b620fca99de6de6d36d7c02f2347e5e2fa6a8110ad671739d57f31b2422404c5
+                      - name: RELATED_IMAGE_IRONIC_INSPECTOR_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-ironic-inspector@sha256:655d180ee998053dd671b203f3ab4484d61ed3ca390ae9c58bb91a9a683c582f
+                      - name: RELATED_IMAGE_IRONIC_PXE_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-ironic-pxe@sha256:c1b5984f3e2ea4a30fd5eee8a6339c33bdbfd93ffca2a95f66eafbb66bf757aa
+                      - name: RELATED_IMAGE_IRONIC_NEUTRON_AGENT_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-ironic-neutron-agent@sha256:6096804ff2c20024708ed40b2d1899037ddce784bd08084d5b2e31b3769ce15d
+                      - name: RELATED_IMAGE_IRONIC_PYTHON_AGENT_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/ironic-python-agent@sha256:e1104e38f151db1103e88a83b45ab5b4bca4bf276ca7da3d5e488bfacf1924ac
+                    image: quay.io/openstack-k8s-operators/ironic-operator@sha256:fd307bcb24417dd966fa990dae4151af46460b3b97bea66d767bab45454f0f91
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: cert
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: ironic-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: cert
+                    secret:
+                      defaultMode: 420
+                      secretName: webhook-server-cert
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: ironic-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - OpenStack
+    - Identity
+    - Ironic
+  links:
+    - name: Ironic Operator
+      url: https://github.com/openstack-k8s-operators/ironic-operator
+  maturity: beta
+  provider:
+    name: Red Hat Inc.
+    url: https://redhat.com/
+  relatedImages:
+    - image: quay.io/podified-antelope-centos9/openstack-ironic-neutron-agent@sha256:6096804ff2c20024708ed40b2d1899037ddce784bd08084d5b2e31b3769ce15d
+      name: ironic_neutron_agent_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-ironic-api@sha256:827d7ae57a9534f6e658b7b202256e43ac6e046c207ba3ae2ff8ead3ce942a93
+      name: ironic-api-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-ironic-pxe@sha256:c1b5984f3e2ea4a30fd5eee8a6339c33bdbfd93ffca2a95f66eafbb66bf757aa
+      name: ironic-pxe-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-ironic-inspector@sha256:655d180ee998053dd671b203f3ab4484d61ed3ca390ae9c58bb91a9a683c582f
+      name: ironic_inspector_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-ironic-api@sha256:827d7ae57a9534f6e658b7b202256e43ac6e046c207ba3ae2ff8ead3ce942a93
+      name: ironic_api_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-ironic-conductor@sha256:b620fca99de6de6d36d7c02f2347e5e2fa6a8110ad671739d57f31b2422404c5
+      name: ironic-conductor-image-url-default
+    - image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+      name: kube-rbac-proxy
+    - image: quay.io/openstack-k8s-operators/ironic-operator@sha256:fd307bcb24417dd966fa990dae4151af46460b3b97bea66d767bab45454f0f91
+      name: manager
+    - image: quay.io/podified-antelope-centos9/openstack-ironic-inspector@sha256:655d180ee998053dd671b203f3ab4484d61ed3ca390ae9c58bb91a9a683c582f
+      name: ironic-inspector-image-url-default
+    - image: quay.io/podified-antelope-centos9/ironic-python-agent@sha256:e1104e38f151db1103e88a83b45ab5b4bca4bf276ca7da3d5e488bfacf1924ac
+      name: ironic-python-agent-image-url-default
+    - image: quay.io/podified-antelope-centos9/ironic-python-agent@sha256:e1104e38f151db1103e88a83b45ab5b4bca4bf276ca7da3d5e488bfacf1924ac
+      name: ironic_python_agent_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-ironic-neutron-agent@sha256:6096804ff2c20024708ed40b2d1899037ddce784bd08084d5b2e31b3769ce15d
+      name: ironic-neutron-agent-image-url-default
+    - image: quay.io/podified-antelope-centos9/openstack-ironic-conductor@sha256:b620fca99de6de6d36d7c02f2347e5e2fa6a8110ad671739d57f31b2422404c5
+      name: ironic_conductor_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-ironic-pxe@sha256:c1b5984f3e2ea4a30fd5eee8a6339c33bdbfd93ffca2a95f66eafbb66bf757aa
+      name: ironic_pxe_image_url_default
+  version: 0.0.1
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: ironic-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mironic.kb.io
+      rules:
+        - apiGroups:
+            - ironic.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - ironics
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-ironic-openstack-org-v1beta1-ironic
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: ironic-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vironic.kb.io
+      rules:
+        - apiGroups:
+            - ironic.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - ironics
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-ironic-openstack-org-v1beta1-ironic

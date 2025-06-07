@@ -1,0 +1,606 @@
+apiVersion: operators.coreos.com/v1alpha1
+kind: ClusterServiceVersion
+metadata:
+  annotations:
+    alm-examples: |-
+      [
+        {
+          "apiVersion": "keystone.openstack.org/v1beta1",
+          "kind": "KeystoneAPI",
+          "metadata": {
+            "name": "keystone"
+          },
+          "spec": {
+            "adminProject": "admin",
+            "adminUser": "admin",
+            "customServiceConfig": "[DEFAULT]\ndebug = true\n",
+            "databaseAccount": "keystone",
+            "databaseInstance": "openstack",
+            "preserveJobs": false,
+            "region": "regionOne",
+            "resources": {
+              "requests": {
+                "cpu": "1.0",
+                "memory": "500Mi"
+              }
+            },
+            "secret": "osp-secret"
+          }
+        },
+        {
+          "apiVersion": "keystone.openstack.org/v1beta1",
+          "kind": "KeystoneEndpoint",
+          "metadata": {
+            "name": "placement"
+          },
+          "spec": {
+            "endpoints": {
+              "admin": "http://placement-admin-openstack.apps-crc.testing",
+              "internal": "http://placement-internal-openstack.apps-crc.testing",
+              "public": "http://placement-public-openstack.apps-crc.testing"
+            },
+            "serviceName": "placement"
+          }
+        },
+        {
+          "apiVersion": "keystone.openstack.org/v1beta1",
+          "kind": "KeystoneService",
+          "metadata": {
+            "name": "placement"
+          },
+          "spec": {
+            "enabled": true,
+            "passwordSelector": "PlacementPassword",
+            "secret": "osp-secret",
+            "serviceDescription": "Placement service",
+            "serviceName": "placement",
+            "serviceType": "placement",
+            "serviceUser": "placement"
+          }
+        }
+      ]
+    capabilities: Basic Install
+    createdAt: "2025-06-05T10:05:29Z"
+    features.operators.openshift.io/disconnected: "true"
+    features.operators.openshift.io/fips-compliant: "true"
+    features.operators.openshift.io/proxy-aware: "false"
+    features.operators.openshift.io/tls-profiles: "false"
+    features.operators.openshift.io/token-auth-aws: "false"
+    features.operators.openshift.io/token-auth-azure: "false"
+    features.operators.openshift.io/token-auth-gcp: "false"
+    operatorframework.io/suggested-namespace: openstack
+    operators.operatorframework.io/builder: operator-sdk-v1.31.0
+    operators.operatorframework.io/operator-type: non-standalone
+    operators.operatorframework.io/project_layout: go.kubebuilder.io/v3
+  name: keystone-operator.v0.0.1
+  namespace: placeholder
+spec:
+  apiservicedefinitions: {}
+  customresourcedefinitions:
+    owned:
+      - description: KeystoneAPI is the Schema for the keystoneapis API
+        displayName: Keystone API
+        kind: KeystoneAPI
+        name: keystoneapis.keystone.openstack.org
+        specDescriptors:
+          - description: TLS - Parameters related to the TLS
+            displayName: TLS
+            path: tls
+        version: v1beta1
+      - description: KeystoneEndpoint is the Schema for the keystoneendpoints API
+        displayName: Keystone Endpoint
+        kind: KeystoneEndpoint
+        name: keystoneendpoints.keystone.openstack.org
+        version: v1beta1
+      - description: KeystoneService is the Schema for the keystoneservices API
+        displayName: Keystone Service
+        kind: KeystoneService
+        name: keystoneservices.keystone.openstack.org
+        version: v1beta1
+  description: Keystone Operator
+  displayName: Keystone Operator
+  install:
+    spec:
+      clusterPermissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - pods
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - serviceaccounts
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - apps
+              resources:
+                - deployments
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - cronjobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - batch
+              resources:
+                - jobs
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - secrets
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - ""
+              resources:
+                - services
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - k8s.cni.cncf.io
+              resources:
+                - network-attachment-definitions
+              verbs:
+                - get
+                - list
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneapis
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneapis/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneapis/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneendpoints
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneendpoints/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneendpoints/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneservices
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneservices/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - keystone.openstack.org
+              resources:
+                - keystoneservices/status
+              verbs:
+                - get
+                - patch
+                - update
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbaccounts/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - mariadb.openstack.org
+              resources:
+                - mariadbdatabases
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - memcached.openstack.org
+              resources:
+                - memcacheds
+              verbs:
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - memcached.openstack.org
+              resources:
+                - memcacheds/finalizers
+              verbs:
+                - patch
+                - update
+            - apiGroups:
+                - rabbitmq.openstack.org
+              resources:
+                - transporturls
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - rolebindings
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - rbac.authorization.k8s.io
+              resources:
+                - roles
+              verbs:
+                - create
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - route.openshift.io
+              resources:
+                - routes
+              verbs:
+                - create
+                - delete
+                - get
+                - list
+                - patch
+                - update
+                - watch
+            - apiGroups:
+                - security.openshift.io
+              resourceNames:
+                - anyuid
+              resources:
+                - securitycontextconstraints
+              verbs:
+                - use
+            - apiGroups:
+                - topology.openstack.org
+              resources:
+                - topologies
+              verbs:
+                - get
+                - list
+                - update
+                - watch
+            - apiGroups:
+                - authentication.k8s.io
+              resources:
+                - tokenreviews
+              verbs:
+                - create
+            - apiGroups:
+                - authorization.k8s.io
+              resources:
+                - subjectaccessreviews
+              verbs:
+                - create
+          serviceAccountName: keystone-operator-controller-manager
+      deployments:
+        - label:
+            control-plane: controller-manager
+            openstack.org/operator-name: keystone
+          name: keystone-operator-controller-manager
+          spec:
+            replicas: 1
+            selector:
+              matchLabels:
+                openstack.org/operator-name: keystone
+            strategy: {}
+            template:
+              metadata:
+                annotations:
+                  kubectl.kubernetes.io/default-container: manager
+                labels:
+                  control-plane: controller-manager
+                  openstack.org/operator-name: keystone
+              spec:
+                containers:
+                  - args:
+                      - --secure-listen-address=0.0.0.0:8443
+                      - --upstream=http://127.0.0.1:8080/
+                      - --logtostderr=true
+                      - --v=0
+                    image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+                    name: kube-rbac-proxy
+                    ports:
+                      - containerPort: 8443
+                        name: https
+                        protocol: TCP
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 128Mi
+                      requests:
+                        cpu: 5m
+                        memory: 64Mi
+                  - args:
+                      - --health-probe-bind-address=:8081
+                      - --metrics-bind-address=127.0.0.1:8080
+                      - --leader-elect
+                    command:
+                      - /manager
+                    env:
+                      - name: RELATED_IMAGE_KEYSTONE_API_IMAGE_URL_DEFAULT
+                        value: quay.io/podified-antelope-centos9/openstack-keystone@sha256:5a9a6ffef49fad12a825c6d8daad27c1bc33de12f1e633584849d33840ede72e
+                    image: quay.io/openstack-k8s-operators/keystone-operator@sha256:3758effecdae62091b67afe9ab364ea1e37018baadac101cd60f6529a7464139
+                    livenessProbe:
+                      httpGet:
+                        path: /healthz
+                        port: 8081
+                      initialDelaySeconds: 15
+                      periodSeconds: 20
+                    name: manager
+                    ports:
+                      - containerPort: 9443
+                        name: webhook-server
+                        protocol: TCP
+                    readinessProbe:
+                      httpGet:
+                        path: /readyz
+                        port: 8081
+                      initialDelaySeconds: 5
+                      periodSeconds: 10
+                    resources:
+                      limits:
+                        cpu: 500m
+                        memory: 256Mi
+                      requests:
+                        cpu: 10m
+                        memory: 128Mi
+                    securityContext:
+                      allowPrivilegeEscalation: false
+                    volumeMounts:
+                      - mountPath: /tmp/k8s-webhook-server/serving-certs
+                        name: cert
+                        readOnly: true
+                securityContext:
+                  runAsNonRoot: true
+                serviceAccountName: keystone-operator-controller-manager
+                terminationGracePeriodSeconds: 10
+                volumes:
+                  - name: cert
+                    secret:
+                      defaultMode: 420
+                      secretName: webhook-server-cert
+      permissions:
+        - rules:
+            - apiGroups:
+                - ""
+              resources:
+                - configmaps
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - coordination.k8s.io
+              resources:
+                - leases
+              verbs:
+                - get
+                - list
+                - watch
+                - create
+                - update
+                - patch
+                - delete
+            - apiGroups:
+                - ""
+              resources:
+                - events
+              verbs:
+                - create
+                - patch
+          serviceAccountName: keystone-operator-controller-manager
+    strategy: deployment
+  installModes:
+    - supported: true
+      type: OwnNamespace
+    - supported: true
+      type: SingleNamespace
+    - supported: false
+      type: MultiNamespace
+    - supported: true
+      type: AllNamespaces
+  keywords:
+    - OpenStack
+    - Identity
+    - Keystone
+  links:
+    - name: Keystone Operator
+      url: https://github.com/openstack-k8s-operators/keystone-operator
+  maturity: beta
+  provider:
+    name: Red Hat Inc.
+    url: https://redhat.com/
+  relatedImages:
+    - image: quay.io/podified-antelope-centos9/openstack-keystone@sha256:5a9a6ffef49fad12a825c6d8daad27c1bc33de12f1e633584849d33840ede72e
+      name: keystone_api_image_url_default
+    - image: quay.io/podified-antelope-centos9/openstack-keystone@sha256:5a9a6ffef49fad12a825c6d8daad27c1bc33de12f1e633584849d33840ede72e
+      name: keystone-api-image-url-default
+    - image: quay.io/openstack-k8s-operators/kube-rbac-proxy@sha256:d28df2924a366ed857d6c2c14baac9741238032d41f3d02c12cd757189b68b8a
+      name: kube-rbac-proxy
+    - image: quay.io/openstack-k8s-operators/keystone-operator@sha256:3758effecdae62091b67afe9ab364ea1e37018baadac101cd60f6529a7464139
+      name: manager
+  version: 0.0.1
+  webhookdefinitions:
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: keystone-operator-controller-manager
+      failurePolicy: Fail
+      generateName: mkeystoneapi.kb.io
+      rules:
+        - apiGroups:
+            - keystone.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - keystoneapis
+      sideEffects: None
+      targetPort: 9443
+      type: MutatingAdmissionWebhook
+      webhookPath: /mutate-keystone-openstack-org-v1beta1-keystoneapi
+    - admissionReviewVersions:
+        - v1
+      containerPort: 443
+      deploymentName: keystone-operator-controller-manager
+      failurePolicy: Fail
+      generateName: vkeystoneapi.kb.io
+      rules:
+        - apiGroups:
+            - keystone.openstack.org
+          apiVersions:
+            - v1beta1
+          operations:
+            - CREATE
+            - UPDATE
+          resources:
+            - keystoneapis
+      sideEffects: None
+      targetPort: 9443
+      type: ValidatingAdmissionWebhook
+      webhookPath: /validate-keystone-openstack-org-v1beta1-keystoneapi
